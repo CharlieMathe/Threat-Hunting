@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EmberForge: Source Leak — Threat Hunt Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #080b0f;
+  --surface:   #0d1117;
+  --surface2:  #161b22;
+  --border:    #21262d;
+  --border2:   #30363d;
+  --accent:    #e05252;
+  --accent2:   #ff7b7b;
+  --blue:      #58a6ff;
+  --green:     #3fb950;
+  --yellow:    #d29922;
+  --muted:     #6e7681;
+  --text:      #cdd9e5;
+  --text2:     #adbac7;
+  --mono:      'Share Tech Mono', monospace;
+  --head:      'Rajdhani', sans-serif;
+  --body:      'Inter', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* Scanline overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  background: rgba(8,11,15,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  gap: 2rem;
+  z-index: 100;
+}
+
+.nav-brand {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.nav-brand span { color: var(--muted); }
+
+.nav-links {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: auto;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.nav-links a:hover {
+  color: var(--text);
+  border-color: var(--border2);
+  background: var(--surface2);
+}
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6rem 2rem 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(224,82,82,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+.hero-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.hero-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hero-tag::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.hero h1 {
+  font-family: var(--head);
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  color: #fff;
+  margin-bottom: 0.25rem;
+}
+
+.hero h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-family: var(--head);
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 3rem;
+}
+
+.hero-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  max-width: 700px;
+}
+
+.meta-item {
+  background: var(--surface);
+  padding: 1rem 1.25rem;
+}
+
+.meta-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.meta-value {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.meta-value.critical { color: var(--accent); font-weight: 600; }
+.meta-value.green { color: var(--green); }
+
+/* MAIN CONTENT */
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 2rem 6rem;
+}
+
+/* SECTION */
+section {
+  padding: 5rem 0 3rem;
+  border-top: 1px solid var(--border);
+  animation: fadeIn 0.6s ease both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.section-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+.section-title {
+  font-family: var(--head);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* KV TABLE */
+.kv-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.kv-item {
+  background: var(--surface);
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.kv-key {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.kv-val {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.kv-val.red { color: var(--accent); }
+.kv-val.blue { color: var(--blue); }
+.kv-val.green { color: var(--green); }
+.kv-val.yellow { color: var(--yellow); }
+
+/* PROSE */
+p {
+  color: var(--text2);
+  margin-bottom: 1rem;
+  max-width: 68ch;
+}
+
+/* FINDING CARDS */
+.findings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.finding {
+  background: var(--surface);
+  padding: 1.25rem 1.5rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: start;
+  transition: background 0.2s;
+  cursor: default;
+}
+
+.finding:hover { background: var(--surface2); }
+
+.finding-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  padding-top: 3px;
+  min-width: 28px;
+}
+
+.finding-body h3 {
+  font-family: var(--head);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.03em;
+  margin-bottom: 4px;
+}
+
+.finding-body p {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+  max-width: none;
+}
+
+.badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge-critical { background: rgba(224,82,82,0.15); color: var(--accent); border: 1px solid rgba(224,82,82,0.3); }
+.badge-high     { background: rgba(210,153,34,0.15); color: var(--yellow); border: 1px solid rgba(210,153,34,0.3); }
+.badge-info     { background: rgba(88,166,255,0.1);  color: var(--blue);   border: 1px solid rgba(88,166,255,0.3); }
+
+/* TIMELINE */
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--accent), var(--border));
+}
+
+.tl-item {
+  position: relative;
+  padding: 0 0 2.5rem 2rem;
+}
+
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.tl-time {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.tl-host {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--blue);
+  background: rgba(88,166,255,0.08);
+  border: 1px solid rgba(88,166,255,0.2);
+  border-radius: 3px;
+  padding: 1px 6px;
+  margin-bottom: 6px;
+}
+
+.tl-event {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.tl-mitre {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* PHASES */
+.phase-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.phase {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.phase-header {
+  background: var(--surface2);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.phase-header:hover { background: #1c2330; }
+
+.phase-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  min-width: 3rem;
+}
+
+.phase-name {
+  font-family: var(--head);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  flex: 1;
+}
+
+.phase-chevron {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  transition: transform 0.3s;
+}
+
+.phase.open .phase-chevron { transform: rotate(90deg); }
+
+.phase-body {
+  display: none;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.phase.open .phase-body { display: block; }
+
+.phase-body p {
+  font-size: 14px;
+  margin-bottom: 1rem;
+}
+
+/* CODE BLOCK */
+pre {
+  background: #0a0d12;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--blue);
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--blue);
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+
+/* IOC TABLE */
+.ioc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.ioc-table th {
+  text-align: left;
+  padding: 0.6rem 1rem;
+  background: var(--surface2);
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.ioc-table td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  vertical-align: top;
+}
+
+.ioc-table tr:last-child td { border-bottom: none; }
+.ioc-table tr:hover td { background: var(--surface2); }
+
+.ioc-table td:first-child { color: var(--muted); font-size: 10px; }
+.ioc-table td:nth-child(2) { color: var(--accent2); }
+
+.ioc-block {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.ioc-block-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.6rem 1rem;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+
+/* MITRE TABLE */
+.mitre-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.mitre-table th {
+  text-align: left;
+  padding: 0.6rem 1rem;
+  background: var(--surface2);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.mitre-table td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  vertical-align: middle;
+}
+
+.mitre-table tr:last-child td { border-bottom: none; }
+.mitre-table tr:hover td { background: var(--surface2); }
+
+.mitre-id {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--blue);
+  white-space: nowrap;
+}
+
+/* RECOMMENDATIONS */
+.rec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.rec-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.5rem;
+}
+
+.rec-card h3 {
+  font-family: var(--head);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rec-icon {
+  font-size: 14px;
+}
+
+.rec-card ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rec-card li {
+  font-size: 13px;
+  color: var(--muted);
+  padding-left: 1rem;
+  position: relative;
+}
+
+.rec-card li::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem;
+  text-align: center;
+}
+
+.footer-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-links a {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover { color: var(--accent); }
+
+/* SCROLL PROGRESS */
+.progress {
+  position: fixed;
+  top: 52px; left: 0;
+  height: 2px;
+  background: var(--accent);
+  z-index: 99;
+  transition: width 0.1s;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .kv-grid { grid-template-columns: 1fr; }
+  .hero-meta { grid-template-columns: 1fr 1fr; }
+  .nav-links { display: none; }
+  .finding { grid-template-columns: auto 1fr; }
+  .badge { display: none; }
+  .footer-inner { flex-direction: column; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<nav>
+  <div class="nav-brand"><span>THREAT HUNT //</span> EMBERFORGE</div>
+  <ul class="nav-links">
+    <li><a href="#summary">Summary</a></li>
+    <li><a href="#findings">Findings</a></li>
+    <li><a href="#timeline">Timeline</a></li>
+    <li><a href="#phases">Analysis</a></li>
+    <li><a href="#iocs">IOCs</a></li>
+    <li><a href="#mitre">MITRE</a></li>
+    <li><a href="#recommendations">Recommendations</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Threat Hunt Report · IR-2026-0131-EF</div>
+    <h1><em>Ember</em>Forge</h1>
+    <div class="hero-sub">Source Leak — Active Directory Breach Investigation</div>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <div class="meta-label">Analyst</div>
+        <div class="meta-value">Károly Mathe</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Date</div>
+        <div class="meta-value">2026-01-31</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Risk Rating</div>
+        <div class="meta-value critical">CRITICAL</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Dwell Time</div>
+        <div class="meta-value">~2.5 hours</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Hosts Compromised</div>
+        <div class="meta-value">3 of 3</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Status</div>
+        <div class="meta-value green">Completed</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- SUMMARY -->
+<section id="summary">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Executive Summary</h2>
+  </div>
+  <p>EmberForge Studios, a game development subsidiary, suffered a targeted intrusion on 30 January 2026 that resulted in the full exfiltration of unreleased source code for the upcoming title <em>Neon Shadows</em>. A lead artist was socially engineered into executing a malicious ISO file disguised as a project review archive, granting the attacker an initial foothold.</p>
+  <p>Within three hours, the attacker escalated to domain administrator privileges, moved laterally across all three network endpoints, stole the Active Directory credential database, and exfiltrated the entire game development directory to a MEGA cloud storage account under their control.</p>
+  <p>The attacker attempted to clear Windows event logs on the Domain Controller, but Sysmon telemetry had already been forwarded to Microsoft Sentinel — preserving a complete forensic record. The evidence chain is assessed as <strong>complete</strong>.</p>
+  <div class="kv-grid" style="margin-top:2rem;">
+    <div class="kv-item"><div class="kv-key">Data Exfiltrated</div><div class="kv-val red">C:\GameDev — Neon Shadows source code</div></div>
+    <div class="kv-item"><div class="kv-key">Exfil Destination</div><div class="kv-val blue">MEGA — jwilson.vhr@proton.me</div></div>
+    <div class="kv-item"><div class="kv-key">Patient Zero</div><div class="kv-val">EMBERFORGE\lmartin</div></div>
+    <div class="kv-item"><div class="kv-key">C2 Infrastructure</div><div class="kv-val blue">cdn.cloud-endpoint.net → 104.21.30.237</div></div>
+    <div class="kv-item"><div class="kv-key">Credentials Exposed</div><div class="kv-val red">lmartin · Administrator · all domain hashes</div></div>
+    <div class="kv-item"><div class="kv-key">Breach Notification</div><div class="kv-val red">Required</div></div>
+  </div>
+</section>
+
+<!-- FINDINGS -->
+<section id="findings">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Key Findings</h2>
+  </div>
+  <div class="findings-grid">
+    <div class="finding">
+      <div class="finding-num">F-01</div>
+      <div class="finding-body">
+        <h3>ISO Delivery Bypasses SmartScreen</h3>
+        <p>Malicious ISO named EmberForge_Review mounted as D:\ — files extracted from ISOs do not inherit Mark-of-the-Web, bypassing SmartScreen entirely. Targeted at Lead Artist lmartin specifically.</p>
+      </div>
+      <span class="badge badge-critical">Critical</span>
+    </div>
+    <div class="finding">
+      <div class="finding-num">F-02</div>
+      <div class="finding-body">
+        <h3>Full Domain Compromise in Under 3 Hours</h3>
+        <p>From initial DLL execution at 21:27 to NTDS.dit theft at 23:35 — all three hosts compromised, every domain credential stolen.</p>
+      </div>
+      <span class="badge badge-critical">Critical</span>
+    </div>
+    <div class="finding">
+      <div class="finding-num">F-03</div>
+      <div class="finding-body">
+        <h3>NTDS.dit Extracted via VSS Shadow Copy</h3>
+        <p>vssadmin created a shadow copy, ntds.dit was copied to a temp file disguised as nyMdRNSp.tmp, shadow deleted. Full sequence completed in under 60 seconds.</p>
+      </div>
+      <span class="badge badge-critical">Critical</span>
+    </div>
+    <div class="finding">
+      <div class="finding-num">F-04</div>
+      <div class="finding-body">
+        <h3>Attacker Credentials Exposed in Logs</h3>
+        <p>MEGA credentials (jwilson.vhr@proton.me / Summer2024!), svc_backup password (P@ssw0rd123!), and Administrator password (EmberForge2024!) all visible in plaintext command lines.</p>
+      </div>
+      <span class="badge badge-critical">Critical</span>
+    </div>
+    <div class="finding">
+      <div class="finding-num">F-05</div>
+      <div class="finding-body">
+        <h3>Backdoor Domain Admin Account Created</h3>
+        <p>svc_backup created and added to Domain Admins at 23:38 UTC. Account persists after malware removal — attacker can re-enter using legitimate credentials.</p>
+      </div>
+      <span class="badge badge-critical">Critical</span>
+    </div>
+    <div class="finding">
+      <div class="finding-num">F-06</div>
+      <div class="finding-body">
+        <h3>Living-off-the-Land Throughout</h3>
+        <p>certutil, Compress-Archive, vssadmin, wevtutil, fodhelper — no third-party malware used. All attacker tools are native Windows binaries.</p>
+      </div>
+      <span class="badge badge-high">High</span>
+    </div>
+    <div class="finding">
+      <div class="finding-num">F-07</div>
+      <div class="finding-body">
+        <h3>Log Clearing Attempted — Sysmon Survived</h3>
+        <p>wevtutil cleared Security and System logs on the DC at 23:50-23:52. Sysmon logs were already in Sentinel. The clearing commands themselves are in the forensic record.</p>
+      </div>
+      <span class="badge badge-high">High</span>
+    </div>
+    <div class="finding">
+      <div class="finding-num">F-08</div>
+      <div class="finding-body">
+        <h3>AnyDesk Installed for Persistent Remote Access</h3>
+        <p>Configured in silent mode with unattended_access_password_hash set to SHA1("password"). AnyDesk.lnk placed in Startup folder on both Workstation and Server.</p>
+      </div>
+      <span class="badge badge-high">High</span>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section id="timeline">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Attack Timeline</h2>
+  </div>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-time">2026-01-30 · 21:24 UTC</div>
+      <div class="tl-host">WORKSTATION</div>
+      <div class="tl-event">7zG.exe extracts EmberForge_Review archive — ISO mounts as D:\</div>
+      <div class="tl-mitre">T1204.002 · T1553.005</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">21:27</div>
+      <div class="tl-host">WORKSTATION</div>
+      <div class="tl-event">explorer.exe &gt; rundll32.exe loads D:\review.dll,StartW — malware executes</div>
+      <div class="tl-mitre">T1218.011</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">21:27</div>
+      <div class="tl-host">WORKSTATION</div>
+      <div class="tl-event">Automated recon: hostname · ipconfig · net user /domain · nltest /dclist — DC located at 10.1.160.76</div>
+      <div class="tl-mitre">T1087.002 · T1069.002 · T1018</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">21:32</div>
+      <div class="tl-host">WORKSTATION</div>
+      <div class="tl-event">rundll32.exe injects into notepad.exe — first process injection for concealment</div>
+      <div class="tl-mitre">T1055</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">21:38</div>
+      <div class="tl-host">WORKSTATION</div>
+      <div class="tl-event">Registry modified for fodhelper UAC bypass — DelegateExecute key set to empty string</div>
+      <div class="tl-mitre">T1548.002</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">21:40</div>
+      <div class="tl-host">WORKSTATION</div>
+      <div class="tl-event">update.exe spawned as NT AUTHORITY\SYSTEM via fodhelper · C2 beacon to cdn.cloud-endpoint.net established</div>
+      <div class="tl-mitre">T1548.002 · T1071.001</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">21:48</div>
+      <div class="tl-host">WORKSTATION</div>
+      <div class="tl-event">lsass.dmp created at C:\Windows\System32\ via direct syscall — LSASS credential dump</div>
+      <div class="tl-mitre">T1003.001</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">21:56</div>
+      <div class="tl-host">WORKSTATION</div>
+      <div class="tl-event">update.exe injects into spoolsv.exe (SYSTEM) — stable long-term foothold established</div>
+      <div class="tl-mitre">T1055</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">22:10</div>
+      <div class="tl-host">SERVER</div>
+      <div class="tl-event">certutil downloads AnyDesk.exe and update.exe from sync.cloud-endpoint.net:8080</div>
+      <div class="tl-mitre">T1105</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">22:14</div>
+      <div class="tl-host">WORKSTATION</div>
+      <div class="tl-event">update.exe copies itself to Server via \\10.1.57.66\C$\Users\Public\</div>
+      <div class="tl-mitre">T1570</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">22:51 — 22:54</div>
+      <div class="tl-host">WORKSTATION</div>
+      <div class="tl-event">net share tools=C:\Users\Public created · Firewall rule "SMB" added for port 445 inbound</div>
+      <div class="tl-mitre">T1021.002 · T1562.004</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">23:06 — 23:12</div>
+      <div class="tl-host">SERVER</div>
+      <div class="tl-event">rclone exfiltrates C:\GameDev to MEGA (jwilson.vhr@proton.me) — credentials exposed in command line</div>
+      <div class="tl-mitre">T1567.002</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">23:34 — 23:35</div>
+      <div class="tl-host">DOMAIN CONTROLLER</div>
+      <div class="tl-event">VSS shadow created · ntds.dit copied · shadow deleted in under 60 seconds</div>
+      <div class="tl-mitre">T1003.003</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">23:38</div>
+      <div class="tl-host">DOMAIN CONTROLLER</div>
+      <div class="tl-event">svc_backup created with P@ssw0rd123! · added to Domain Admins</div>
+      <div class="tl-mitre">T1136.002</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">23:50 — 23:52</div>
+      <div class="tl-host">DOMAIN CONTROLLER</div>
+      <div class="tl-event">wevtutil cl Security · wevtutil cl System — log clearing attempted</div>
+      <div class="tl-mitre">T1070.001</div>
+    </div>
+  </div>
+</section>
+
+<!-- ANALYSIS -->
+<section id="phases">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Attack Phase Analysis</h2>
+  </div>
+  <div class="phase-grid">
+
+    <div class="phase open">
+      <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="phase-num">PHASE 1</span>
+        <span class="phase-name">Initial Access — ISO Delivery & MotW Bypass</span>
+        <span class="badge badge-critical">T1204.002</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <p>Lisa Martin received a file named to appeal directly to her role as Lead Artist — a project review archive. The file was delivered as an ISO disk image, specifically chosen to bypass Windows' Mark-of-the-Web protection. Files extracted from a mounted ISO do not inherit the MotW tag, allowing silent execution with no SmartScreen warning shown to the user.</p>
+        <p>The execution chain: <code>explorer.exe > rundll32.exe > D:\review.dll,StartW</code></p>
+        <pre>EmberForgeX_CL
+| where EventCode_s == "1"
+| where Computer contains "B9GHHO6"
+| where CommandLine_s contains "review.dll"
+| project UtcTime_s, User_s, Image_s, CommandLine_s, ParentImage_s</pre>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="phase-num">PHASE 2</span>
+        <span class="phase-name">Privilege Escalation — fodhelper UAC Bypass</span>
+        <span class="badge badge-critical">T1548.002</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <p>The malware wrote update.exe into the registry key read by fodhelper.exe — a trusted Windows binary that auto-elevates without a UAC prompt. Setting the DelegateExecute value (even empty) triggers elevation. update.exe was spawned as NT AUTHORITY\SYSTEM without any user interaction.</p>
+        <pre>EmberForgeX_CL
+| where EventCode_s == "13"
+| where TargetObject_s contains "ms-settings\shell\open\command"
+| project UtcTime_s, Image_s, TargetObject_s, Details_s</pre>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="phase-num">PHASE 3</span>
+        <span class="phase-name">Credential Access — LSASS & NTDS.dit</span>
+        <span class="badge badge-critical">T1003.001 · T1003.003</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <p>Two credential theft operations: LSASS dumped on the workstation using direct syscalls (bypassing EventCode 10 — no API monitoring triggered), and NTDS.dit extracted on the DC via VSS shadow copy. The NTDS.dit contains every domain password hash. Combined, all credentials in the environment are compromised.</p>
+        <pre>EmberForgeX_CL
+| where EventCode_s == "11"
+| where TargetFilename_s has_any (".dmp", "lsass")
+| project UtcTime_s, Computer, Image_s, TargetFilename_s</pre>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="phase-num">PHASE 4</span>
+        <span class="phase-name">Lateral Movement — Impacket Remote Execution</span>
+        <span class="badge badge-critical">T1021.002 · T1570</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <p>Initial lateral movement via NTLM Pass-the-Hash failed (11 consecutive 4625 events, error 0x80090308). The attacker pivoted to Impacket — creating random 8-character Windows services (MzLblBFm, QjhJMWqS, pGJLIKnC) that execute commands, write output to C$\__output, and self-delete. First command on every new host: whoami.</p>
+        <pre>EmberForgeX_CL
+| where EventCode_s == "7045"
+| extend ServiceName = extract("ServiceName'>([^&lt;]+)", 1, Raw_s)
+| extend ServiceFile = extract("ImagePath'>([^&lt;]+)", 1, Raw_s)
+| project TimeGenerated, Computer, ServiceName, ServiceFile</pre>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="phase-num">PHASE 5</span>
+        <span class="phase-name">Exfiltration — rclone to MEGA</span>
+        <span class="badge badge-critical">T1567.002</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <p>C:\GameDev compressed via native PowerShell Compress-Archive cmdlet (no third-party tools), then uploaded to MEGA via rclone. Three attempts were made — the second exposed credentials in plaintext on the command line when the config file failed. Connection confirmed to bt5.api.mega.co.nz (66.203.125.15) on port 443.</p>
+        <pre>EmberForgeX_CL
+| where EventCode_s == "3"
+| where Computer contains "16V3AU4"
+| where Image_s contains "rclone"
+| project UtcTime_s, DestinationIp_s, DestinationPort_s, DestinationHostname_s</pre>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="phase-num">PHASE 6</span>
+        <span class="phase-name">Persistence — Five Mechanisms</span>
+        <span class="badge badge-high">T1053.005 · T1219 · T1136.002</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <p>Five distinct persistence mechanisms were established: (1) Scheduled task WindowsUpdate running update.exe on startup and logon. (2) AnyDesk installed in silent mode with unattended access password set to SHA1("password"). (3) AnyDesk.lnk in Startup folder on Workstation and Server. (4) update.exe injected into spoolsv.exe (SYSTEM). (5) svc_backup Domain Admin account — survives full endpoint rebuild.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- IOCs -->
+<section id="iocs">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Indicators of Compromise</h2>
+  </div>
+
+  <div class="ioc-block">
+    <div class="ioc-block-title">Network Indicators</div>
+    <table class="ioc-table">
+      <thead><tr><th>Type</th><th>Indicator</th><th>Context</th></tr></thead>
+      <tbody>
+        <tr><td>Domain</td><td>cdn.cloud-endpoint.net</td><td>C2 beaconing endpoint</td></tr>
+        <tr><td>Domain</td><td>sync.cloud-endpoint.net</td><td>Attacker tool staging server</td></tr>
+        <tr><td>IP</td><td>104.21.30.237</td><td>C2 primary (Cloudflare-proxied)</td></tr>
+        <tr><td>IP</td><td>172.67.174.46</td><td>C2 secondary (Cloudflare-proxied)</td></tr>
+        <tr><td>IP</td><td>66.203.125.15</td><td>MEGA upload destination</td></tr>
+        <tr><td>Email</td><td>jwilson.vhr@proton.me</td><td>Attacker MEGA account</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ioc-block">
+    <div class="ioc-block-title">File Indicators</div>
+    <table class="ioc-table">
+      <thead><tr><th>File</th><th>Path</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td>review.dll</td><td>D:\review.dll</td><td>Initial payload (malicious DLL)</td></tr>
+        <tr><td>update.exe</td><td>C:\Users\Public\update.exe</td><td>Primary RAT — SHA256: 44959138...</td></tr>
+        <tr><td>rclone.exe</td><td>C:\Users\Public\rclone.exe</td><td>Exfiltration tool</td></tr>
+        <tr><td>AnyDesk.exe</td><td>C:\ProgramData\AnyDesk\</td><td>Persistent remote access</td></tr>
+        <tr><td>lsass.dmp</td><td>C:\Windows\System32\lsass.dmp</td><td>LSASS credential dump</td></tr>
+        <tr><td>AnyDesk.lnk</td><td>...\Start Menu\Programs\Startup\</td><td>Autostart persistence</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ioc-block">
+    <div class="ioc-block-title">Account Indicators</div>
+    <table class="ioc-table">
+      <thead><tr><th>Account</th><th>Type</th><th>Required Action</th></tr></thead>
+      <tbody>
+        <tr><td>svc_backup</td><td>Backdoor Domain Admin</td><td>Delete immediately</td></tr>
+        <tr><td>EMBERFORGE\lmartin</td><td>Compromised — patient zero</td><td>Reset password</td></tr>
+        <tr><td>EMBERFORGE\Administrator</td><td>Password exposed in logs</td><td>Reset immediately</td></tr>
+        <tr><td>All domain accounts</td><td>NTDS.dit exfiltrated</td><td>Full domain reset</td></tr>
+        <tr><td>krbtgt</td><td>Kerberos signing account</td><td>Reset TWICE (24hrs apart)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- MITRE -->
+<section id="mitre">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2 class="section-title">MITRE ATT&amp;CK Mapping</h2>
+  </div>
+  <div class="ioc-block">
+    <table class="mitre-table">
+      <thead><tr><th>Tactic</th><th>Technique</th><th>ID</th><th>Priority</th></tr></thead>
+      <tbody>
+        <tr><td>Initial Access</td><td>User Execution: Malicious File</td><td class="mitre-id">T1204.002</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Initial Access</td><td>Subvert Trust Controls: MotW Bypass</td><td class="mitre-id">T1553.005</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Execution</td><td>System Binary Proxy: Rundll32</td><td class="mitre-id">T1218.011</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Execution</td><td>System Services: Service Execution</td><td class="mitre-id">T1569.002</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Persistence</td><td>Scheduled Task: WindowsUpdate</td><td class="mitre-id">T1053.005</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Persistence</td><td>Boot Autostart: Startup Folder</td><td class="mitre-id">T1547.001</td><td><span class="badge badge-high">High</span></td></tr>
+        <tr><td>Persistence</td><td>Create Account: Domain Account</td><td class="mitre-id">T1136.002</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Persistence</td><td>Remote Access Software: AnyDesk</td><td class="mitre-id">T1219</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Privilege Escalation</td><td>Abuse Elevation: fodhelper UAC Bypass</td><td class="mitre-id">T1548.002</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Defense Evasion</td><td>Process Injection</td><td class="mitre-id">T1055</td><td><span class="badge badge-high">High</span></td></tr>
+        <tr><td>Defense Evasion</td><td>Masquerading: update.exe</td><td class="mitre-id">T1036.005</td><td><span class="badge badge-high">High</span></td></tr>
+        <tr><td>Defense Evasion</td><td>Indicator Removal: Clear Event Logs</td><td class="mitre-id">T1070.001</td><td><span class="badge badge-high">High</span></td></tr>
+        <tr><td>Credential Access</td><td>OS Credential Dumping: LSASS</td><td class="mitre-id">T1003.001</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Credential Access</td><td>OS Credential Dumping: NTDS</td><td class="mitre-id">T1003.003</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Discovery</td><td>Account Discovery: Domain Account</td><td class="mitre-id">T1087.002</td><td><span class="badge badge-info">Medium</span></td></tr>
+        <tr><td>Lateral Movement</td><td>Remote Services: SMB Admin Shares</td><td class="mitre-id">T1021.002</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Collection</td><td>Archive Collected Data</td><td class="mitre-id">T1560.001</td><td><span class="badge badge-high">High</span></td></tr>
+        <tr><td>Exfiltration</td><td>Exfiltration to Cloud Storage: MEGA</td><td class="mitre-id">T1567.002</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Command &amp; Control</td><td>Application Layer Protocol: HTTPS</td><td class="mitre-id">T1071.001</td><td><span class="badge badge-critical">Critical</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- RECOMMENDATIONS -->
+<section id="recommendations">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2 class="section-title">Recommendations</h2>
+  </div>
+  <div class="rec-grid">
+    <div class="rec-card">
+      <h3><span class="rec-icon">🔴</span> Immediate (0–4 hrs)</h3>
+      <ul>
+        <li>Delete svc_backup from Active Directory</li>
+        <li>Reset Administrator password — EmberForge2024! is exposed</li>
+        <li>Reset krbtgt TWICE (24 hrs apart)</li>
+        <li>Block *.cloud-endpoint.net at DNS and firewall</li>
+        <li>Report jwilson.vhr@proton.me to MEGA abuse team</li>
+        <li>Isolate all three endpoints from network</li>
+      </ul>
+    </div>
+    <div class="rec-card">
+      <h3><span class="rec-icon">🟠</span> Short Term (4–24 hrs)</h3>
+      <ul>
+        <li>Remove update.exe, rclone.exe, AnyDesk from all hosts</li>
+        <li>Delete scheduled task WindowsUpdate</li>
+        <li>Remove AnyDesk.lnk from Startup folders</li>
+        <li>Remove firewall rule SMB (port 445 inbound)</li>
+        <li>Full domain password reset — NTDS.dit stolen</li>
+        <li>Delete lsass.dmp from C:\Windows\System32\</li>
+      </ul>
+    </div>
+    <div class="rec-card">
+      <h3><span class="rec-icon">🛡️</span> Detection Rules</h3>
+      <ul>
+        <li>Alert: spoolsv.exe spawning cmd.exe or powershell.exe</li>
+        <li>Alert: certutil -urlcache with outbound HTTP</li>
+        <li>Alert: random 8-char service names (Impacket)</li>
+        <li>Alert: .dmp file created outside WerFault.exe</li>
+        <li>Alert: Sysmon service stopped (EventCode 7036)</li>
+        <li>Alert: ms-settings registry key modification</li>
+      </ul>
+    </div>
+    <div class="rec-card">
+      <h3><span class="rec-icon">🔵</span> Long Term</h3>
+      <ul>
+        <li>Enable Credential Guard to protect LSASS</li>
+        <li>Deploy Protected Process Light for Sysmon</li>
+        <li>Implement LAPS for local admin passwords</li>
+        <li>Block ISO auto-mount or require prompt</li>
+        <li>Network segmentation — Workstation to DC</li>
+        <li>Phishing-resistant MFA across all accounts</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-text">IR-2026-0131-EF · Károly Mathe · Log(n) Pacific · CONFIDENTIAL TLP:AMBER</div>
+    <div class="footer-links">
+      <a href="https://github.com/CharlieMathe/Threat-Hunting" target="_blank">GitHub</a>
+      <a href="https://attack.mitre.org" target="_blank">MITRE ATT&amp;CK</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Scroll progress bar
+window.addEventListener('scroll', () => {
+  const el = document.getElementById('progress');
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  el.style.width = Math.min(pct, 100) + '%';
+});
+
+// Staggered fade-in for sections
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      e.target.style.animationDelay = '0s';
+      e.target.style.animationPlayState = 'running';
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('section').forEach(s => {
+  s.style.animationPlayState = 'paused';
+  observer.observe(s);
+});
+
+// Smooth active nav highlighting
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent)' : '';
+  });
+});
+</script>
+</body>
+</html>
