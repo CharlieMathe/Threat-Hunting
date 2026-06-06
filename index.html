@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Threat Hunt Portfolio — Károly Mathe</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #080b0f;
+  --surface:  #0d1117;
+  --surface2: #161b22;
+  --border:   #21262d;
+  --border2:  #30363d;
+  --red:      #e05252;
+  --red2:     #ff7b7b;
+  --blue:     #4fa8d5;
+  --blue2:    #7dc6ed;
+  --green:    #3fb950;
+  --yellow:   #d29922;
+  --muted:    #6e7681;
+  --text:     #cdd9e5;
+  --text2:    #adbac7;
+  --mono:     'Share Tech Mono', monospace;
+  --head:     'Rajdhani', sans-serif;
+  --body:     'Inter', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* scanline */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  background: rgba(8,11,15,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  gap: 2rem;
+  z-index: 100;
+}
+.nav-brand {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  letter-spacing: 0.08em;
+}
+.nav-brand span { color: var(--muted); }
+.nav-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.nav-right a {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.nav-right a:hover { color: var(--text); }
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 7rem 2rem 5rem;
+  position: relative;
+  overflow: hidden;
+  max-width: 960px;
+  margin: 0 auto;
+}
+.hero::after {
+  content: '';
+  position: fixed;
+  top: -30%;
+  left: -10%;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(224,82,82,0.04) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.hero-tag::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 1px;
+  background: var(--muted);
+}
+
+.hero h1 {
+  font-family: var(--head);
+  font-size: clamp(3.5rem, 9vw, 7rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 0.92;
+  color: #fff;
+  margin-bottom: 1.5rem;
+}
+
+.hero-desc {
+  font-family: var(--body);
+  font-size: 1rem;
+  color: var(--text2);
+  max-width: 55ch;
+  margin-bottom: 3rem;
+  line-height: 1.8;
+}
+
+/* STATS STRIP */
+.stats {
+  display: flex;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  max-width: 640px;
+}
+.stat {
+  flex: 1;
+  padding: 1rem 1.25rem;
+  border-right: 1px solid var(--border);
+}
+.stat:last-child { border-right: none; }
+.stat-val {
+  font-family: var(--mono);
+  font-size: 1.6rem;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* SECTION */
+section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 5rem 2rem 0;
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.section-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+.section-title {
+  font-family: var(--head);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* HUNT GRID */
+.hunt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* HUNT CARD */
+.hunt-card {
+  background: var(--surface);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.hunt-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.hunt-card.red::before  { background: var(--red); }
+.hunt-card.blue::before { background: var(--blue); }
+.hunt-card.locked::before { background: var(--border2); }
+
+.hunt-card:not(.locked):hover { background: var(--surface2); }
+.hunt-card:not(.locked):hover .card-arrow { transform: translate(3px, -3px); }
+
+/* card locked overlay */
+.hunt-card.locked {
+  cursor: default;
+  opacity: 0.55;
+}
+.lock-badge {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  border: 1px solid var(--border2);
+  border-radius: 3px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.card-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+.card-arrow {
+  font-family: var(--mono);
+  font-size: 18px;
+  color: var(--muted);
+  transition: transform 0.2s;
+}
+
+.card-name {
+  font-family: var(--head);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+.card-name em {
+  font-style: normal;
+}
+.hunt-card.red  .card-name em { color: var(--red); }
+.hunt-card.blue .card-name em { color: var(--blue); }
+
+.card-subtitle {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.card-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.65;
+}
+
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+.tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+.tag-critical { background: rgba(224,82,82,0.12); color: var(--red); border: 1px solid rgba(224,82,82,0.25); }
+.tag-blue     { background: rgba(79,168,213,0.12); color: var(--blue); border: 1px solid rgba(79,168,213,0.25); }
+.tag-muted    { background: rgba(110,118,129,0.12); color: var(--muted); border: 1px solid var(--border2); }
+
+.card-divider {
+  height: 1px;
+  background: var(--border);
+}
+
+.card-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+.cs-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-right: 1rem;
+  border-right: 1px solid var(--border);
+}
+.cs-item:last-child { border-right: none; padding-right: 0; }
+.cs-val {
+  font-family: var(--mono);
+  font-size: 1rem;
+  color: var(--text);
+}
+.hunt-card.red  .cs-val { color: var(--red); }
+.hunt-card.blue .cs-val { color: var(--blue); }
+.hunt-card.locked .cs-val { color: var(--muted); }
+.cs-key {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* PLATFORM SECTION */
+.platform-strip {
+  margin-top: 5rem;
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 2rem;
+}
+.platform-inner {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+.platform-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.platform-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+}
+.tool-pill {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 4px 10px;
+  letter-spacing: 0.04em;
+}
+
+/* FOOTER */
+footer {
+  max-width: 960px;
+  margin: 5rem auto 0;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.footer-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+.footer-links a {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--text); }
+
+/* scroll progress */
+.progress {
+  position: fixed;
+  top: 52px; left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--red), var(--blue));
+  z-index: 99;
+  transition: width 0.1s;
+}
+
+/* ANIM */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 640px) {
+  .stats { flex-wrap: wrap; }
+  .stat { min-width: 50%; border-bottom: 1px solid var(--border); }
+  .hunt-grid { grid-template-columns: 1fr; }
+  nav .nav-right { display: none; }
+  footer { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<nav>
+  <div class="nav-brand"><span>ANALYST //</span> KÁROLY MATHE</div>
+  <div class="nav-right">
+    <a href="https://github.com/CharlieMathe/Threat-Hunting" target="_blank">GitHub</a>
+    <a href="https://attack.mitre.org" target="_blank">MITRE ATT&amp;CK</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Log(n) Pacific · Threat Hunt Portfolio · 2026</div>
+  <h1>Hunt<br>Archive</h1>
+  <p class="hero-desc">
+    Threat hunt investigations using Microsoft Sentinel, KQL, and MITRE ATT&CK.
+    Each operation reconstructs a full attack chain from initial access to exfiltration
+    using real telemetry, documented for breach notification and defensive improvement.
+  </p>
+  <div class="stats fade-in">
+    <div class="stat">
+      <div class="stat-val">2</div>
+      <div class="stat-label">Hunts Complete</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">49</div>
+      <div class="stat-label">Flags Captured</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">25+</div>
+      <div class="stat-label">MITRE Techniques</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">5</div>
+      <div class="stat-label">Hosts Analyzed</div>
+    </div>
+  </div>
+</div>
+
+<!-- HUNTS -->
+<section>
+  <div class="section-header fade-in">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Operations</h2>
+  </div>
+
+  <div class="hunt-grid fade-in">
+
+    <!-- HUNT 1: EmberForge -->
+    <a class="hunt-card red" href="./EmberForge-Source-Leak/">
+      <div class="card-top">
+        <span class="card-num">HUNT-01 · 2026-01-31</span>
+        <span class="card-arrow">↗</span>
+      </div>
+      <div>
+        <div class="card-name"><em>Ember</em>Forge</div>
+        <div class="card-subtitle">Source Leak — Active Directory Breach</div>
+      </div>
+      <p class="card-desc">
+        Full domain compromise of a game studio subsidiary in under 3 hours.
+        ISO-delivered malware bypassed SmartScreen, escalated to SYSTEM via fodhelper,
+        and exfiltrated unreleased source code to a MEGA account.
+      </p>
+      <div class="card-meta">
+        <span class="tag tag-critical">Critical</span>
+        <span class="tag tag-muted">Azure Sentinel</span>
+        <span class="tag tag-muted">Sysmon</span>
+        <span class="tag tag-muted">AD</span>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-stats">
+        <div class="cs-item">
+          <span class="cs-val">20</span>
+          <span class="cs-key">Flags</span>
+        </div>
+        <div class="cs-item">
+          <span class="cs-val">3/3</span>
+          <span class="cs-key">Hosts</span>
+        </div>
+        <div class="cs-item">
+          <span class="cs-val">19</span>
+          <span class="cs-key">MITRE IDs</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- HUNT 2: Signals After the Noise 2 -->
+    <a class="hunt-card blue" href="./Signals after the noise/">
+      <div class="card-top">
+        <span class="card-num">HUNT-02 · 2026</span>
+        <span class="card-arrow">↗</span>
+      </div>
+      <div>
+        <div class="card-name"><em>Signals</em> After the Noise 2</div>
+        <div class="card-subtitle">Post-Intrusion · PHTG HealthCloud</div>
+      </div>
+      <p class="card-desc">
+        Post-intrusion investigation against a simulated healthcare organisation in Azure Sentinel.
+        Reconstructed attacker behavior across 8 phases using Defender for Endpoint telemetry and KQL.
+      </p>
+      <div class="card-meta">
+        <span class="tag tag-critical">Critical</span>
+        <span class="tag tag-blue">Azure Sentinel</span>
+        <span class="tag tag-muted">MDE</span>
+        <span class="tag tag-muted">Healthcare</span>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-stats">
+        <div class="cs-item">
+          <span class="cs-val">29</span>
+          <span class="cs-key">Flags</span>
+        </div>
+        <div class="cs-item">
+          <span class="cs-val">8</span>
+          <span class="cs-key">Phases</span>
+        </div>
+        <div class="cs-item">
+          <span class="cs-val">—</span>
+          <span class="cs-key">MITRE IDs</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- HUNT 3: Locked -->
+    <div class="hunt-card locked">
+      <span class="lock-badge">Pending</span>
+      <div class="card-top">
+        <span class="card-num">HUNT-03 · TBD</span>
+      </div>
+      <div>
+        <div class="card-name">Hunt 03</div>
+        <div class="card-subtitle">Operation Unreleased</div>
+      </div>
+      <p class="card-desc">
+        Next operation in progress. Details classified until investigation is complete
+        and report is published.
+      </p>
+      <div class="card-meta">
+        <span class="tag tag-muted">In Progress</span>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-stats">
+        <div class="cs-item">
+          <span class="cs-val">—</span>
+          <span class="cs-key">Flags</span>
+        </div>
+        <div class="cs-item">
+          <span class="cs-val">—</span>
+          <span class="cs-key">Phases</span>
+        </div>
+        <div class="cs-item">
+          <span class="cs-val">—</span>
+          <span class="cs-key">MITRE IDs</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PLATFORM STRIP -->
+<div class="platform-strip fade-in">
+  <div class="platform-inner">
+    <span class="platform-label">Toolkit</span>
+    <div class="platform-tools">
+      <span class="tool-pill">Microsoft Sentinel</span>
+      <span class="tool-pill">Microsoft Defender for Endpoint</span>
+      <span class="tool-pill">KQL</span>
+      <span class="tool-pill">MITRE ATT&amp;CK</span>
+      <span class="tool-pill">Sysmon</span>
+      <span class="tool-pill">Azure Log Analytics</span>
+      <span class="tool-pill">Windows Security Events</span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-text">Károly Mathe · Log(n) Pacific · TLP:AMBER</div>
+  <div class="footer-links">
+    <a href="https://github.com/CharlieMathe/Threat-Hunting" target="_blank">GitHub</a>
+    <a href="https://attack.mitre.org" target="_blank">MITRE ATT&amp;CK</a>
+    <a href="https://www.linkedin.com/in/karoly-mathe/" target="_blank">LinkedIn</a>
+  </div>
+</footer>
+
+<script>
+window.addEventListener('scroll', () => {
+  const el = document.getElementById('progress');
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  el.style.width = Math.min(pct, 100) + '%';
+});
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
