@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Second Vector — M365 Identity Compromise · Threat Hunt Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #080b0f;
+  --surface:   #0d1117;
+  --surface2:  #161b22;
+  --border:    #21262d;
+  --border2:   #30363d;
+  --accent:    #a371f7;
+  --accent2:   #c9b6ff;
+  --blue:      #58a6ff;
+  --green:     #3fb950;
+  --yellow:    #d29922;
+  --red:       #e05252;
+  --muted:     #6e7681;
+  --text:      #cdd9e5;
+  --text2:     #adbac7;
+  --mono:      'Share Tech Mono', monospace;
+  --head:      'Rajdhani', sans-serif;
+  --body:      'Inter', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* Scanline overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  background: rgba(8,11,15,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  gap: 2rem;
+  z-index: 100;
+}
+
+.nav-brand {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.nav-brand span { color: var(--muted); }
+
+.nav-links {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: auto;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.nav-links a:hover {
+  color: var(--text);
+  border-color: var(--border2);
+  background: var(--surface2);
+}
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6rem 2rem 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(163,113,247,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+.hero-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.hero-cover {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto 2.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 0 80px rgba(163,113,247,0.08);
+}
+
+.hero-cover img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.hero-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hero-tag::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.hero h1 {
+  font-family: var(--head);
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  color: #fff;
+  margin-bottom: 0.25rem;
+}
+
+.hero h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-family: var(--head);
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 3rem;
+}
+
+.hero-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  max-width: 900px;
+}
+
+.meta-item {
+  background: var(--surface);
+  padding: 1rem 1.25rem;
+}
+
+.meta-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.meta-value {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.meta-value.critical { color: var(--accent); font-weight: 600; }
+.meta-value.green { color: var(--green); }
+
+/* MAIN CONTENT */
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 2rem 6rem;
+}
+
+/* SECTION */
+section {
+  padding: 5rem 0 3rem;
+  border-top: 1px solid var(--border);
+  animation: fadeIn 0.6s ease both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.section-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+.section-title {
+  font-family: var(--head);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+
+/* KV TABLE */
+.kv-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.kv-item {
+  background: var(--surface);
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.kv-key {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.kv-val {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.kv-val.red { color: var(--red); }
+.kv-val.accent { color: var(--accent); }
+.kv-val.blue { color: var(--blue); }
+.kv-val.green { color: var(--green); }
+.kv-val.yellow { color: var(--yellow); }
+
+/* PROSE */
+p {
+  color: var(--text2);
+  margin-bottom: 1rem;
+  max-width: 68ch;
+}
+
+p em { color: var(--accent2); font-style: italic; }
+
+/* FINDING CARDS */
+.findings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.finding {
+  background: var(--surface);
+  padding: 1.25rem 1.5rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: start;
+  transition: background 0.2s;
+  cursor: default;
+}
+
+.finding:hover { background: var(--surface2); }
+
+.finding-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  padding-top: 3px;
+  min-width: 28px;
+}
+
+.finding-body h3 {
+  font-family: var(--head);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.03em;
+  margin-bottom: 4px;
+}
+
+.finding-body p {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+  max-width: none;
+}
+
+.badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge-critical { background: rgba(163,113,247,0.15); color: var(--accent); border: 1px solid rgba(163,113,247,0.3); }
+.badge-high     { background: rgba(210,153,34,0.15); color: var(--yellow); border: 1px solid rgba(210,153,34,0.3); }
+.badge-info     { background: rgba(88,166,255,0.1);  color: var(--blue);   border: 1px solid rgba(88,166,255,0.3); }
+
+/* TIMELINE */
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--accent), var(--border));
+}
+
+.tl-item {
+  position: relative;
+  padding: 0 0 2.5rem 2rem;
+}
+
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+/* Robotic phase markers */
+.tl-item.robotic::before {
+  background: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue);
+}
+
+.tl-item.silent::before {
+  background: var(--muted);
+  box-shadow: 0 0 0 1px var(--muted);
+}
+
+.tl-time {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.tl-item.robotic .tl-time { color: var(--blue); }
+.tl-item.silent .tl-time { color: var(--muted); }
+
+.tl-host {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent2);
+  background: rgba(163,113,247,0.08);
+  border: 1px solid rgba(163,113,247,0.2);
+  border-radius: 3px;
+  padding: 1px 6px;
+  margin-bottom: 6px;
+}
+
+.tl-item.robotic .tl-host {
+  color: var(--blue);
+  background: rgba(88,166,255,0.08);
+  border-color: rgba(88,166,255,0.2);
+}
+
+.tl-event {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.tl-mitre {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* PHASES */
+.phase-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.phase {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.phase-header {
+  background: var(--surface2);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.phase-header:hover { background: #1c2330; }
+
+.phase-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  min-width: 3rem;
+}
+
+.phase-name {
+  font-family: var(--head);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  flex: 1;
+}
+
+.phase-chevron {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  transition: transform 0.3s;
+}
+
+.phase.open .phase-chevron { transform: rotate(90deg); }
+
+.phase-body {
+  display: none;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.phase.open .phase-body { display: block; }
+
+.phase-body p {
+  font-size: 14px;
+  margin-bottom: 1rem;
+}
+
+/* CODE BLOCK */
+pre {
+  background: #0a0d12;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent2);
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 0.92em;
+  color: var(--accent2);
+  background: rgba(163,113,247,0.08);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* IOC TABLE */
+.ioc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.ioc-table th {
+  text-align: left;
+  padding: 0.6rem 1rem;
+  background: var(--surface2);
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.ioc-table td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  vertical-align: top;
+}
+
+.ioc-table tr:last-child td { border-bottom: none; }
+.ioc-table tr:hover td { background: var(--surface2); }
+
+.ioc-table td:first-child { color: var(--muted); font-size: 10px; }
+.ioc-table td:nth-child(2) { color: var(--accent2); }
+
+.ioc-block {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.ioc-block-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.6rem 1rem;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+
+/* MITRE TABLE */
+.mitre-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.mitre-table th {
+  text-align: left;
+  padding: 0.6rem 1rem;
+  background: var(--surface2);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.mitre-table td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  vertical-align: middle;
+}
+
+.mitre-table tr:last-child td { border-bottom: none; }
+.mitre-table tr:hover td { background: var(--surface2); }
+
+.mitre-id {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--blue);
+  white-space: nowrap;
+}
+
+/* RECOMMENDATIONS */
+.rec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.rec-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.5rem;
+}
+
+.rec-card h3 {
+  font-family: var(--head);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rec-icon {
+  font-size: 14px;
+}
+
+.rec-card ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rec-card li {
+  font-size: 13px;
+  color: var(--muted);
+  padding-left: 1rem;
+  position: relative;
+}
+
+.rec-card li::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+.rec-card.containment li::before { color: var(--red); }
+
+/* RHYTHM BAND (three rhythms visual) */
+.rhythm-band {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 2rem 0;
+}
+
+.rhythm {
+  background: var(--surface);
+  padding: 1.25rem 1.5rem;
+}
+
+.rhythm-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.rhythm-title {
+  font-family: var(--head);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  letter-spacing: 0.03em;
+}
+
+.rhythm.silent .rhythm-title { color: var(--muted); }
+.rhythm.human .rhythm-title { color: var(--accent); }
+.rhythm.robotic .rhythm-title { color: var(--blue); }
+
+.rhythm-time {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+
+.rhythm-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem;
+  text-align: center;
+}
+
+.footer-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-links a {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover { color: var(--accent); }
+
+/* SCROLL PROGRESS */
+.progress {
+  position: fixed;
+  top: 52px; left: 0;
+  height: 2px;
+  background: var(--accent);
+  z-index: 99;
+  transition: width 0.1s;
+}
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  .kv-grid { grid-template-columns: 1fr; }
+  .hero-meta { grid-template-columns: 1fr 1fr; }
+  .nav-links { display: none; }
+  .finding { grid-template-columns: auto 1fr; }
+  .badge { display: none; }
+  .footer-inner { flex-direction: column; text-align: center; }
+  .rhythm-band { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<nav>
+  <div class="nav-brand"><span>THREAT HUNT //</span> SECOND VECTOR</div>
+  <ul class="nav-links">
+    <li><a href="#summary">Summary</a></li>
+    <li><a href="#findings">Findings</a></li>
+    <li><a href="#rhythms">Rhythms</a></li>
+    <li><a href="#timeline">Timeline</a></li>
+    <li><a href="#phases">Phases</a></li>
+    <li><a href="#iocs">IOCs</a></li>
+    <li><a href="#mitre">MITRE</a></li>
+    <li><a href="#recommendations">Response</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-cover">
+    <img src="Screenshots/Second%20vector.png" alt="Second Vector — Hunt Cover">
+  </div>
+  <div class="hero-inner">
+    <div class="hero-tag">Threat Hunt Report · IR-2026-0611-SV</div>
+    <h1>Second <em>Vector</em></h1>
+    <div class="hero-sub">M365 Identity Compromise — BEC &amp; Silent Exfiltration</div>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <div class="meta-label">Analyst</div>
+        <div class="meta-value">Károly Mathe</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Date</div>
+        <div class="meta-value">2026-06-11</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Risk Rating</div>
+        <div class="meta-value critical">CRITICAL</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Dwell Time</div>
+        <div class="meta-value">~1.5 hr + 9 hr auto</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Accounts Hit</div>
+        <div class="meta-value">m.smith</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Status</div>
+        <div class="meta-value green">Completed</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- SUMMARY -->
+<section id="summary">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Executive Summary</h2>
+  </div>
+  <p>A Low-severity Entra ID Protection alert on finance user <code>m.smith@lognpacific.org</code> proved to be the visible edge of a complete Business Email Compromise. A stolen session cookie was replayed through Outlook Web to bypass MFA, the operator profiled the account via Graph API, planted concealment and forwarding inbox rules, exfiltrated three sensitive files from SharePoint, and ran an internal payment-redirect scam against a colleague — reinforced minutes later on Teams.</p>
+  <p>A Power Automate flow planted during the session kept forwarding mail to an external Proton address <em>nine hours after the human operator logged off</em>. Conditional Access reported <code>notApplied</code> on every successful sign-in; the tenant's MFA policy never engaged on the attacker's traffic.</p>
+  <p>No malware, no endpoint, no outage. Every action read as routine in isolation. Risk assessment is <strong>Critical</strong> despite the original Low rating.</p>
+  <div class="kv-grid" style="margin-top:2rem;">
+    <div class="kv-item"><div class="kv-key">Compromised Principal</div><div class="kv-val accent">m.smith@lognpacific.org</div></div>
+    <div class="kv-item"><div class="kv-key">Attacker IP</div><div class="kv-val">103.69.224.136 (Amsterdam, anonymous proxy)</div></div>
+    <div class="kv-item"><div class="kv-key">Session GUID</div><div class="kv-val">005d431a-380b-1f5e-e554-16d5010dc28e</div></div>
+    <div class="kv-item"><div class="kv-key">OAuth Persistence App</div><div class="kv-val red">7ab7862c-4c57-491e-8a45-d52a7e023983</div></div>
+    <div class="kv-item"><div class="kv-key">Exfil Destination</div><div class="kv-val red">merovingian1337@proton.me</div></div>
+    <div class="kv-item"><div class="kv-key">Files Exfiltrated</div><div class="kv-val">3 (VPN creds, vendor banking, workbook)</div></div>
+    <div class="kv-item"><div class="kv-key">Tables Pivoted</div><div class="kv-val blue">7 (Sentinel + Defender XDR)</div></div>
+    <div class="kv-item"><div class="kv-key">MFA Posture</div><div class="kv-val red">notApplied on 38/38 successful sign-ins</div></div>
+  </div>
+</section>
+
+<!-- RHYTHMS -->
+<section id="rhythms">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Three Rhythms</h2>
+  </div>
+  <p>The compromise has three rhythms. Reading them in order is what turns a pile of low-severity events into a single coherent intrusion.</p>
+  <div class="rhythm-band">
+    <div class="rhythm silent">
+      <div class="rhythm-label">Rhythm 01 · Silent</div>
+      <div class="rhythm-title">Cookie Birth</div>
+      <div class="rhythm-time">May 31, 2026</div>
+      <div class="rhythm-desc">Password change at 00:53:27 coincides with first connection from the attacker's /24. Legitimate user almost certainly authenticated through an AiTM phishing kit; the session cookie was harvested at the proxy.</div>
+    </div>
+    <div class="rhythm human">
+      <div class="rhythm-label">Rhythm 02 · Human</div>
+      <div class="rhythm-title">The Operator</div>
+      <div class="rhythm-time">Jun 11 · 02:22 – 04:18 UTC</div>
+      <div class="rhythm-desc">Two bad-password attempts via legacy Office client, then Graph recon, then a single OWA sign-in marked <code>singleFactorAuthentication</code>. Inside one session: two inbox rules, three SharePoint downloads, fraud email, Teams reinforcement.</div>
+    </div>
+    <div class="rhythm robotic">
+      <div class="rhythm-label">Rhythm 03 · Robotic</div>
+      <div class="rhythm-title">The Flow Wakes</div>
+      <div class="rhythm-time">Jun 11 · 12:41 PM UTC</div>
+      <div class="rhythm-desc">Power Automate calls Graph <code>/forward</code> from a Microsoft-owned Azure IP. The attacker is offline; their automation is not. The OAuth grant on AppId <code>7ab7862c</code> holds the door open until explicitly revoked.</div>
+    </div>
+  </div>
+  <p>Every individual signal was unremarkable. The evidence of intent lives only in the <em>pattern</em> — and the pattern only assembles when seven log sources are tied to one session GUID.</p>
+</section>
+
+<!-- FINDINGS -->
+<section id="findings">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Key Findings</h2>
+  </div>
+  <div class="findings-grid">
+    <div class="finding">
+      <div class="finding-num">F-01</div>
+      <div class="finding-body">
+        <h3>Token Replay Bypassed MFA Entirely</h3>
+        <p>29 successful sign-ins from the attacker's IP, every one tagged <code>singleFactorAuthentication</code> with <code>AuthenticationMethod: Previously satisfied</code>. The session cookie claimed prior MFA without ever prompting — the AiTM signature on an MFA-required tenant.</p>
+      </div>
+      <span class="badge badge-critical">Critical</span>
+    </div>
+    <div class="finding">
+      <div class="finding-num">F-02</div>
+      <div class="finding-body">
+        <h3>Conditional Access Never Engaged</h3>
+        <p><code>ConditionalAccessStatus = notApplied</code> on all 38 successful sign-ins. The policy exists but did not cover the legacy authentication path the attacker used. This is the largest single control failure of the incident.</p>
+      </div>
+      <span class="badge badge-critical">Critical</span>
+    </div>
+    <div class="finding">
+      <div class="finding-num">F-03</div>
+      <div class="finding-body">
+        <h3>Pre-Login Graph Recon Profiled MFA Posture</h3>
+        <p>Three Graph API calls to <code>/userRegistrationDetails</code> against <code>m.smith</code> in the six minutes <em>before</em> the successful OWA login. The attacker checked exactly what they were about to bypass before spending the token.</p>
+      </div>
+      <span class="badge badge-high">High</span>
+    </div>
+    <div class="finding">
+      <div class="finding-num">F-04</div>
+      <div class="finding-body">
+        <h3>Two Inbox Rules, Nine Seconds Apart</h3>
+        <p><code>Invoice Processing</code> moved replies to Archive (concealment, not deletion — deletion would create a gap). <code>Backup Copy</code> forwarded inbound mail to <code>merovingian1337@proton.me</code>. Together: the victim sees nothing; the attacker sees everything.</p>
+      </div>
+      <span class="badge badge-critical">Critical</span>
+    </div>
+    <div class="finding">
+      <div class="finding-num">F-05</div>
+      <div class="finding-body">
+        <h3>Power Automate Flow Survives Password Reset</h3>
+        <p>OAuth grant on AppId <code>7ab7862c-4c57-491e-8a45-d52a7e023983</code> kept calling Graph <code>/forward</code> nine hours after the human session ended — from a Microsoft Azure IP, not the attacker's. Persistence at the cloud-identity layer, not the endpoint.</p>
+      </div>
+      <span class="badge badge-critical">Critical</span>
+    </div>
+    <div class="finding">
+      <div class="finding-num">F-06</div>
+      <div class="finding-body">
+        <h3>Three SharePoint Files Taken in One Second</h3>
+        <p>VPN credentials, vendor banking details, and a workbook — downloaded at 03:37 AM from a Linux UA on an anonymous proxy. A curated pull (one for re-entry, one for fraud, one for reference), not a smash-and-grab.</p>
+      </div>
+      <span class="badge badge-critical">Critical</span>
+    </div>
+    <div class="finding">
+      <div class="finding-num">F-07</div>
+      <div class="finding-body">
+        <h3>Multi-Channel Internal BEC</h3>
+        <p>Fraudulent email to <code>j.reynolds</code> at 04:13:54 ("Updated Banking Details"), reinforced by a Teams message four minutes later on the same theme. Pretext mined from a real Feb 8 vendor-payment thread inside the mailbox.</p>
+      </div>
+      <span class="badge badge-critical">Critical</span>
+    </div>
+    <div class="finding">
+      <div class="finding-num">F-08</div>
+      <div class="finding-body">
+        <h3>Exfil Address Was a Known Contact</h3>
+        <p><code>merovingian1337@proton.me</code> corresponded with <code>m.smith</code> on Feb 8 ("Updated Invoice - Meridian Consulting Q1 2026") — four months before the active intrusion. Either a vendor whose trust was abused, or evidence of prior reconnaissance.</p>
+      </div>
+      <span class="badge badge-high">High</span>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section id="timeline">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Attack Timeline</h2>
+  </div>
+  <p>Three rhythms in one chronology. Note the spacing: the attacker spent eleven minutes inside SharePoint and the mailbox, then went silent for nine hours while their automation finished the job.</p>
+  <div class="timeline">
+    <div class="tl-item silent">
+      <div class="tl-time">2026-05-31 · 00:53:27 UTC</div>
+      <div class="tl-host">RHYTHM 01 · SILENT</div>
+      <div class="tl-event">m.smith password change — same hour as first connection from the attacker's /24 (likely AiTM moment)</div>
+      <div class="tl-mitre">T1550.004 (cookie harvest precursor)</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">2026-06-11 · 02:22 — 02:24 UTC</div>
+      <div class="tl-host">RHYTHM 02 · HUMAN</div>
+      <div class="tl-event">Two bad-password attempts via legacy "Microsoft Office" app (ResultType 50126)</div>
+      <div class="tl-mitre">T1110 (credential validation)</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">03:09 — 03:12 UTC</div>
+      <div class="tl-host">RHYTHM 02 · HUMAN</div>
+      <div class="tl-event">3× Graph calls to /userRegistrationDetails on m.smith — MFA-posture reconnaissance</div>
+      <div class="tl-mitre">T1087.004</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">03:09 — 03:12 UTC</div>
+      <div class="tl-host">RHYTHM 02 · HUMAN</div>
+      <div class="tl-event">Graph call to /rolemanagement/directory/transitiveRoleAssignments — privilege check</div>
+      <div class="tl-mitre">T1087.004</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">03:15:45 UTC</div>
+      <div class="tl-host">RHYTHM 02 · HUMAN</div>
+      <div class="tl-event">First successful OWA sign-in — singleFactorAuthentication, "Previously satisfied"</div>
+      <div class="tl-mitre">T1078.004 · T1550.004</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">03:28 UTC</div>
+      <div class="tl-host">RHYTHM 02 · HUMAN</div>
+      <div class="tl-event">Activity in Microsoft Flow Portal — Power Automate flow created, OAuth grant on AppId 7ab7862c established</div>
+      <div class="tl-mitre">T1546</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">03:32:22 UTC</div>
+      <div class="tl-host">RHYTHM 02 · HUMAN</div>
+      <div class="tl-event">Inbox rule "Invoice Processing" created (MoveToFolder → Archive)</div>
+      <div class="tl-mitre">T1564.008</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">03:32:31 UTC</div>
+      <div class="tl-host">RHYTHM 02 · HUMAN</div>
+      <div class="tl-event">Inbox rule "Backup Copy" created (ForwardTo → merovingian1337@proton.me)</div>
+      <div class="tl-mitre">T1564.008</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">03:35 — 03:42 UTC</div>
+      <div class="tl-host">RHYTHM 02 · HUMAN</div>
+      <div class="tl-event">SharePoint browsing — yomark.pdf accessed (pointer file, no download)</div>
+      <div class="tl-mitre">T1555</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">03:37 UTC</div>
+      <div class="tl-host">RHYTHM 02 · HUMAN</div>
+      <div class="tl-event">3× FileDownloaded in one second: VPN-Access-Credentials.txt, Vendor-Banking-Details.txt, Book.xlsx</div>
+      <div class="tl-mitre">T1530</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">03:45 UTC</div>
+      <div class="tl-host">RHYTHM 02 · HUMAN</div>
+      <div class="tl-event">Graph call to /me/memberOf — social-graph enumeration (different AppId, post-login)</div>
+      <div class="tl-mitre">T1069.003</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">04:13:54 UTC</div>
+      <div class="tl-host">RHYTHM 02 · HUMAN</div>
+      <div class="tl-event">Fraudulent email to j.reynolds — "Updated Banking Details - Pacific IT Monthly" (SenderIPv4 103.69.224.136)</div>
+      <div class="tl-mitre">T1534</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">04:17:56 UTC</div>
+      <div class="tl-host">RHYTHM 02 · HUMAN</div>
+      <div class="tl-event">Teams MessageSent to j.reynolds — 4-min reinforcement of the email</div>
+      <div class="tl-mitre">T1534</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">~04:18 UTC</div>
+      <div class="tl-host">RHYTHM 02 · HUMAN</div>
+      <div class="tl-event">Active session ends. Attacker offline for ~9 hours.</div>
+      <div class="tl-mitre">—</div>
+    </div>
+    <div class="tl-item robotic">
+      <div class="tl-time">12:35:14 UTC</div>
+      <div class="tl-host">RHYTHM 03 · ROBOTIC</div>
+      <div class="tl-event">Power Automate fires — first of ~53 Graph calls from AppId 7ab7862c on Azure IP 20.150.129.194</div>
+      <div class="tl-mitre">T1546 · T1020</div>
+    </div>
+    <div class="tl-item robotic">
+      <div class="tl-time">12:41:09 UTC</div>
+      <div class="tl-host">RHYTHM 03 · ROBOTIC</div>
+      <div class="tl-event">Graph POST /me/messages/{id}/forward — HTTP 202 Accepted</div>
+      <div class="tl-mitre">T1020</div>
+    </div>
+    <div class="tl-item robotic">
+      <div class="tl-time">12:41:14 UTC</div>
+      <div class="tl-host">RHYTHM 03 · ROBOTIC</div>
+      <div class="tl-event">FW: mail delivered to merovingian1337@proton.me via Exchange Online relay 20.190.190.224</div>
+      <div class="tl-mitre">T1020</div>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE ANALYSIS -->
+<section id="phases">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Attack Phase Analysis</h2>
+  </div>
+  <p>Each phase opens with the analytic question that drove it. The thread that held everything together was the session GUID <code>005d431a-380b-1f5e-e554-16d5010dc28e</code> — present in <code>SigninLogs.SessionId</code> and embedded in <code>CloudAppEvents.RawEventData</code>.</p>
+  <div class="phase-grid">
+
+    <div class="phase open">
+      <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="phase-num">PHASE 1</span>
+        <span class="phase-name">Initial Access — The Replayed Cookie</span>
+        <span class="badge badge-critical">T1550.004</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <p>29 successful sign-ins from <code>103.69.224.136</code>, every one tagged <code>AuthenticationRequirement = singleFactorAuthentication</code>. <code>AuthenticationDetails</code> shows <code>"authenticationMethod":"Previously satisfied"</code> — Entra's way of saying "I'm not asking for MFA again because this session already proved it elsewhere." A session token does not re-authenticate a person; it claims a person already did, and Entra trusts the claim.</p>
+        <p>Two failed password attempts at 02:22 and 02:24 (<code>ResultType 50126</code> via legacy "Microsoft Office" app) preceded the OWA token replay by ~50 minutes. The sequence is the attacker's logic: try the password against a legacy endpoint, fail, then commit the stolen cookie against the modern web client where it cannot be challenged.</p>
+        <pre>SigninLogs
+| where IPAddress == "103.69.224.136"
+| where ResultType == 0
+| extend AuthDetails = tostring(AuthenticationDetails)
+| project TimeGenerated, UserPrincipalName, AppDisplayName,
+          AuthenticationRequirement, AuthDetails, SessionId
+| sort by TimeGenerated asc</pre>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="phase-num">PHASE 2</span>
+        <span class="phase-name">Discovery — Profiling Before Striking</span>
+        <span class="badge badge-high">T1087.004 · T1069.003</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <p>Six minutes <em>before</em> the successful sign-in, three Graph calls to <code>/userRegistrationDetails</code> against <code>m.smith</code>. Same endpoint admins use to audit MFA registration; calling it from an end-user context is textbook account discovery. A separate call to <code>/rolemanagement/directory/transitiveRoleAssignments</code> asked the privilege question ("am I admin?"). At 03:45, a different AppId queried <code>/me/memberOf</code> — the social graph that becomes the BEC target list.</p>
+        <p>The ordering is the signal: failed-passwords → MFA-posture recon → role recon → token replay → group enumeration → file access → mail send. No log source seen in isolation will catch this; only cross-table correlation by session ID will.</p>
+        <pre>MicrosoftGraphActivityLogs
+| where TimeGenerated between (datetime(2026-06-11 03:00) .. datetime(2026-06-11 04:00))
+| where RequestUri contains "userRegistrationDetails"
+| where RequestUri contains "m.smith"
+| project TimeGenerated, IPAddress, RequestUri, ResponseStatusCode</pre>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="phase-num">PHASE 3</span>
+        <span class="phase-name">Persistence — Inbox Rules and a Sleeping Flow</span>
+        <span class="badge badge-critical">T1564.008 · T1546</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <p>Stage one: two inbox rules created nine seconds apart. <code>Invoice Processing</code> moves replies to Archive (not Delete — deletion creates a noticeable gap; an Archive move keeps mail readable by the attacker and invisible to the victim). <code>Backup Copy</code> forwards to <code>merovingian1337@proton.me</code>. The naming is camouflage.</p>
+        <p>Stage two: a Power Automate flow created at ~03:28 produces an OAuth grant against AppId <code>7ab7862c-4c57-491e-8a45-d52a7e023983</code>. That grant is the durable artifact. A password reset doesn't revoke it. Disabling the account doesn't revoke it. Revoking sessions doesn't revoke it. Only <em>Enterprise Applications → that AppId → Remove</em> does.</p>
+        <pre>OfficeActivity
+| where Operation in ("New-InboxRule", "Set-InboxRule")
+| where UserId == "m.smith@lognpacific.org"
+| project TimeGenerated, ClientIP, Operation, Parameters</pre>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="phase-num">PHASE 4</span>
+        <span class="phase-name">Internal Phish — The Con</span>
+        <span class="badge badge-critical">T1534</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <p>At 04:13:54, an email left <code>m.smith</code>'s mailbox to <code>j.reynolds</code> — subject "Updated Banking Details - Pacific IT Monthly". Real sender, real signature, real history. Not a spoof. Pretext mined four minutes earlier from a real Feb 8 vendor-payment thread inside the same mailbox. Classic BEC playbook: read first, write second.</p>
+        <p>Four minutes later, a Teams <code>MessageSent</code> from the same session reinforced the email. Two channels means two trust signals and one social-pressure cue. The Invoice Processing rule guarantees the reply gets archived; the Backup Copy rule guarantees the attacker sees the reply anyway; the Teams message guarantees the recipient is in a hurry.</p>
+        <pre>EmailEvents
+| where SenderFromAddress == "m.smith@lognpacific.org"
+| where SenderIPv4 == "103.69.224.136"
+| project TimeGenerated, Subject, RecipientEmailAddress, DeliveryAction</pre>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="phase-num">PHASE 5</span>
+        <span class="phase-name">Exfiltration — Two Hands on the Files</span>
+        <span class="badge badge-critical">T1530 · T1020</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <p>Hand one — manual SharePoint downloads at 03:37: VPN credentials, vendor banking sheet, a workbook. Three files in one second is a curated pull. <code>FileDownloaded</code> is categorically different from <code>FileAccessed</code>: it produces a copy off-tenant. <code>yomark.pdf</code> was viewed but not downloaded — pointer file pattern (T1555).</p>
+        <p>Hand two — autonomous Power Automate forwarding at 12:41 PM. The cause lives in <code>MicrosoftGraphActivityLogs</code> (the Graph <code>/forward</code> call from AppId <code>7ab7862c</code> on Azure IP <code>20.150.129.194</code>); the effect lives in <code>EmailEvents</code> (the FW: copy to <code>merovingian1337@proton.me</code> five seconds later). The attacker's IP is completely absent. No human, no keyboard — just Microsoft's own infrastructure executing the planted automation.</p>
+        <pre>MicrosoftGraphActivityLogs
+| where AppId == "7ab7862c-4c57-491e-8a45-d52a7e023983"
+| where RequestUri has_any ("/forward", "/sendMail")
+| project TimeGenerated, IPAddress, RequestUri, ResponseStatusCode</pre>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- IOCs -->
+<section id="iocs">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2 class="section-title">Indicators of Compromise</h2>
+  </div>
+
+  <div class="ioc-block">
+    <div class="ioc-block-title">Network Indicators</div>
+    <table class="ioc-table">
+      <thead><tr><th>Type</th><th>Indicator</th><th>Context</th></tr></thead>
+      <tbody>
+        <tr><td>IP</td><td>103.69.224.136</td><td>Attacker session — Amsterdam, anonymous proxy, Linux UA</td></tr>
+        <tr><td>IP</td><td>103.69.224.32</td><td>Same /24 — first observed May 31, likely AiTM recon source</td></tr>
+        <tr><td>IP</td><td>20.150.129.194</td><td>Power Automate flow execution — Microsoft Azure range</td></tr>
+        <tr><td>IP</td><td>20.190.190.224</td><td>Exchange Online relay delivering the autonomous forward</td></tr>
+        <tr><td>Email</td><td>merovingian1337@proton.me</td><td>Exfiltration destination — also corresponded with m.smith on Feb 8 (pre-intrusion contact)</td></tr>
+        <tr><td>UA</td><td>Mozilla/5.0 (X11; Linux x86_64) ... Chrome/149</td><td>Attacker browser fingerprint</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ioc-block">
+    <div class="ioc-block-title">Identity &amp; Session Indicators</div>
+    <table class="ioc-table">
+      <thead><tr><th>Type</th><th>Indicator</th><th>Required Action</th></tr></thead>
+      <tbody>
+        <tr><td>Principal</td><td>m.smith@lognpacific.org</td><td>Revoke sessions, reset password, re-register MFA</td></tr>
+        <tr><td>Session GUID</td><td>005d431a-380b-1f5e-e554-16d5010dc28e</td><td>The string that binds SigninLogs and CloudAppEvents together</td></tr>
+        <tr><td>OAuth AppId</td><td>7ab7862c-4c57-491e-8a45-d52a7e023983</td><td>Power Automate persistence — must be revoked in Enterprise Applications</td></tr>
+        <tr><td>Tenant ID</td><td>939e93f3-04f6-479d-82ff-345c231abb4d</td><td>LOG(N) Pacific (context only)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ioc-block">
+    <div class="ioc-block-title">File Indicators</div>
+    <table class="ioc-table">
+      <thead><tr><th>File</th><th>Path</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td>VPN-Access-Credentials.txt</td><td>/Documents/IT-Credentials/</td><td>Downloaded — rotate credentials immediately</td></tr>
+        <tr><td>Vendor-Banking-Details.txt</td><td>/Documents/Finance/</td><td>Downloaded — assume exposed</td></tr>
+        <tr><td>Book.xlsx</td><td>/Documents/</td><td>Downloaded — review contents, treat as exposed</td></tr>
+        <tr><td>yomark.pdf</td><td>/Documents/</td><td>Accessed only — review as possible credential-store pointer</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ioc-block">
+    <div class="ioc-block-title">Mailbox-Rule Indicators</div>
+    <table class="ioc-table">
+      <thead><tr><th>Rule</th><th>Action</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>Invoice Processing</td><td>MoveToFolder → Archive</td><td>Concealment — suppresses replies to the fraud thread</td></tr>
+        <tr><td>Backup Copy</td><td>ForwardTo → merovingian1337@proton.me</td><td>Exfiltration — must be deleted via Exchange admin</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- MITRE -->
+<section id="mitre">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2 class="section-title">MITRE ATT&amp;CK Mapping</h2>
+  </div>
+  <div class="ioc-block">
+    <table class="mitre-table">
+      <thead><tr><th>Tactic</th><th>Technique</th><th>ID</th><th>Priority</th></tr></thead>
+      <tbody>
+        <tr><td>Initial Access</td><td>Valid Accounts: Cloud Accounts</td><td class="mitre-id">T1078.004</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Initial Access</td><td>Web Session Cookie</td><td class="mitre-id">T1550.004</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Command &amp; Control</td><td>Proxy</td><td class="mitre-id">T1090</td><td><span class="badge badge-high">High</span></td></tr>
+        <tr><td>Discovery</td><td>Account Discovery: Cloud Account (MFA posture)</td><td class="mitre-id">T1087.004</td><td><span class="badge badge-high">High</span></td></tr>
+        <tr><td>Discovery</td><td>Permission Groups Discovery: Cloud Groups</td><td class="mitre-id">T1069.003</td><td><span class="badge badge-info">Medium</span></td></tr>
+        <tr><td>Collection</td><td>Email Collection: Remote (OWA)</td><td class="mitre-id">T1114.002</td><td><span class="badge badge-high">High</span></td></tr>
+        <tr><td>Initial Access (internal)</td><td>Internal Spearphishing</td><td class="mitre-id">T1534</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Defense Evasion</td><td>Hide Artifacts: Email Hiding Rules</td><td class="mitre-id">T1564.008</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Collection</td><td>Data from Cloud Storage</td><td class="mitre-id">T1530</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Credential Access</td><td>Credentials from Password Stores</td><td class="mitre-id">T1555</td><td><span class="badge badge-high">High</span></td></tr>
+        <tr><td>Persistence</td><td>Event Triggered Execution (OAuth + Flow)</td><td class="mitre-id">T1546</td><td><span class="badge badge-critical">Critical</span></td></tr>
+        <tr><td>Exfiltration</td><td>Automated Exfiltration</td><td class="mitre-id">T1020</td><td><span class="badge badge-critical">Critical</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- RECOMMENDATIONS -->
+<section id="recommendations">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2 class="section-title">Response &amp; Recommendations</h2>
+  </div>
+  <p>Containment must follow the listed order. Password reset alone leaves the flow running; rule deletion alone leaves the flow running. Only OAuth-grant revocation closes the durable channel.</p>
+  <div class="rec-grid">
+    <div class="rec-card containment">
+      <h3><span class="rec-icon">🔴</span> Containment Order (sequential)</h3>
+      <ul>
+        <li>Revoke m.smith's active sign-in sessions (kills the cookie)</li>
+        <li>Reset password &amp; force MFA re-registration</li>
+        <li>Revoke OAuth grant on AppId 7ab7862c in Enterprise Applications</li>
+        <li>Delete the Power Automate flow in admin.powerplatform.microsoft.com</li>
+        <li>Delete inbox rules "Invoice Processing" and "Backup Copy"</li>
+        <li>Rotate every credential in the downloaded files</li>
+        <li>Notify j.reynolds out-of-band (not email)</li>
+        <li>Mailbox audit: all sent items between 03:15 – 04:18 UTC</li>
+        <li>Investigate merovingian1337@proton.me as pre-existing contact</li>
+      </ul>
+    </div>
+    <div class="rec-card">
+      <h3><span class="rec-icon">🛡️</span> Detection Engineering</h3>
+      <ul>
+        <li>Correlate SigninLogs.SessionId across CloudAppEvents, OfficeActivity, EmailEvents, Graph</li>
+        <li>Alert on every New-InboxRule with external ForwardTo/RedirectTo</li>
+        <li>Alert on MoveToFolder rules with sender/subject filters</li>
+        <li>Daily OAuth-grant review for finance, HR, exec users</li>
+        <li>Alert: singleFactorAuthentication + ConditionalAccessStatus=notApplied</li>
+        <li>Alert: Graph /forward from non-Microsoft AppId &gt; 5×/24h</li>
+        <li>Alert: /userRegistrationDetails from end-user contexts</li>
+      </ul>
+    </div>
+    <div class="rec-card">
+      <h3><span class="rec-icon">🟠</span> Policy &amp; Hardening</h3>
+      <ul>
+        <li>Block legacy authentication via Conditional Access</li>
+        <li>Require phishing-resistant MFA (FIDO2 / Windows Hello) for finance &amp; approvers</li>
+        <li>Treat singleFactorAuthentication on anonymized IPs as a CA trigger</li>
+        <li>Restrict Power Automate connector creation for non-admin users</li>
+        <li>Require admin approval for OAuth consents on sensitive scopes</li>
+        <li>Reduce session token lifetimes for finance/approver roles</li>
+      </ul>
+    </div>
+    <div class="rec-card">
+      <h3><span class="rec-icon">🔵</span> Detection Gaps Observed</h3>
+      <ul>
+        <li>ConditionalAccessStatus=notApplied on 38/38 successes — policy didn't cover the path</li>
+        <li>7 of 8 risk events auto-dismissed as Low</li>
+        <li>External-forward inbox rules not alerting</li>
+        <li>OAuth grants to non-Microsoft AppIds not surfaced</li>
+        <li>No cross-table session-GUID correlation in place</li>
+        <li>Legacy "Microsoft Office" auth surface still reachable</li>
+        <li>AuditLogs returned zero records — coverage gap</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL ASSESSMENT -->
+<section id="assessment">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2 class="section-title">Final Assessment</h2>
+  </div>
+  <p>The night-shift verdict — <em>Low severity, dismissed</em> — was wrong. The compromise scored Low because every individual signal scored Low: one anonymous sign-in, one inbox rule, a handful of SharePoint downloads, an internal email between colleagues. The compromise lives entirely in the <em>pattern</em>, and the pattern only assembles when seven log sources are bound to one session GUID.</p>
+  <p><strong>On attacker sophistication.</strong> The operator is deliberate, not opportunistic. ~45 minute pause between failed passwords and the cookie commit, Graph reconnaissance against the account's MFA posture, pretext mined from a four-month-old vendor thread, concealment and forwarding planted nine seconds apart, and a Power Automate flow that survives every credential-level remediation. This is the BEC tradecraft of an operator who has done this before.</p>
+  <p><strong>On defensive posture.</strong> The tenant has the telemetry to reconstruct this attack — every record needed for this report was present in Sentinel. What it does not yet have is the analytic surface to surface it in real time. The single most impactful change is correlation by session GUID across <code>SigninLogs</code>, <code>CloudAppEvents</code>, <code>OfficeActivity</code>, <code>EmailEvents</code>, and <code>MicrosoftGraphActivityLogs</code>. The second most impactful is OAuth-grant review for finance, HR, and exec users.</p>
+  <p><strong>On risk rating.</strong> The compromise is <strong>Critical</strong>, not Low. Three sensitive files left the tenant. A BEC was executed against an internal colleague with social-pressure reinforcement on a second channel. The exfiltration mechanism continues to run autonomously until an OAuth grant is explicitly revoked. Breach-notification obligations should be assessed in the next 24 hours.</p>
+</section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-text">IR-2026-0611-SV · Károly Mathe · Log(n) Pacific · CONFIDENTIAL TLP:AMBER</div>
+    <div class="footer-links">
+      <a href="https://github.com/CharlieMathe/Threat-Hunting" target="_blank">GitHub</a>
+      <a href="https://attack.mitre.org" target="_blank">MITRE ATT&amp;CK</a>
+      <a href="https://www.linkedin.com/in/karoly-mathe/" target="_blank">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Scroll progress bar
+window.addEventListener('scroll', () => {
+  const el = document.getElementById('progress');
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  el.style.width = Math.min(pct, 100) + '%';
+});
+
+// Staggered fade-in for sections
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e) => {
+    if (e.isIntersecting) {
+      e.target.style.animationDelay = '0s';
+      e.target.style.animationPlayState = 'running';
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('section').forEach(s => {
+  s.style.animationPlayState = 'paused';
+  observer.observe(s);
+});
+
+// Smooth active nav highlighting
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent)' : '';
+  });
+});
+</script>
+</body>
+</html>
