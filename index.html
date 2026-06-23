@@ -238,8 +238,10 @@ section {
   top: 0; left: 0; right: 0;
   height: 2px;
 }
-.hunt-card.red::before  { background: var(--red); }
-.hunt-card.blue::before { background: var(--blue); }
+.hunt-card.red::before    { background: var(--red); }
+.hunt-card.blue::before   { background: var(--blue); }
+.hunt-card.violet::before { background: #a371f7; }
+.hunt-card.violet .card-name em { color: #a371f7; }
 .hunt-card.locked::before { background: var(--border2); }
 
 .hunt-card:not(.locked):hover { background: var(--surface2); }
@@ -328,6 +330,7 @@ section {
 }
 .tag-critical { background: rgba(224,82,82,0.12); color: var(--red); border: 1px solid rgba(224,82,82,0.25); }
 .tag-blue     { background: rgba(79,168,213,0.12); color: var(--blue); border: 1px solid rgba(79,168,213,0.25); }
+.tag-violet   { background: rgba(163,113,247,0.12); color: #a371f7; border: 1px solid rgba(163,113,247,0.25); }
 .tag-muted    { background: rgba(110,118,129,0.12); color: var(--muted); border: 1px solid var(--border2); }
 
 .card-divider {
@@ -489,19 +492,19 @@ footer {
   </p>
   <div class="stats fade-in">
     <div class="stat">
-      <div class="stat-val">2</div>
+      <div class="stat-val">3</div>
       <div class="stat-label">Hunts Complete</div>
     </div>
     <div class="stat">
-      <div class="stat-val">49</div>
+      <div class="stat-val">86</div>
       <div class="stat-label">Flags Captured</div>
     </div>
     <div class="stat">
-      <div class="stat-val">25+</div>
+      <div class="stat-val">31+</div>
       <div class="stat-label">MITRE Techniques</div>
     </div>
     <div class="stat">
-      <div class="stat-val">5</div>
+      <div class="stat-val">6</div>
       <div class="stat-label">Hosts Analyzed</div>
     </div>
   </div>
@@ -517,7 +520,7 @@ footer {
   <div class="hunt-grid fade-in">
 
     <!-- HUNT 1: EmberForge -->
-    <a class="hunt-card red" href="./EmberForge-Source-Leak/">
+    <a class="hunt-card red" href="https://charliemathe.github.io/Threat-Hunting/EmberForge-Source-Leak/" target="_blank" rel="noopener">
       <div class="card-top">
         <span class="card-num">HUNT-01 · 2026-01-31</span>
         <span class="card-arrow">↗</span>
@@ -555,7 +558,7 @@ footer {
     </a>
 
     <!-- HUNT 2: Signals After the Noise 2 -->
-    <a class="hunt-card blue" href="./Signals after the noise/">
+    <a class="hunt-card blue" href="https://charliemathe.github.io/Threat-Hunting/Signals-After-the-Noise-2/" target="_blank" rel="noopener">
       <div class="card-top">
         <span class="card-num">HUNT-02 · 2026</span>
         <span class="card-arrow">↗</span>
@@ -591,39 +594,43 @@ footer {
       </div>
     </a>
 
-    <!-- HUNT 3: Locked -->
-    <div class="hunt-card locked">
-      <span class="lock-badge">Pending</span>
+    <!-- HUNT 3: Second Vector -->
+    <a class="hunt-card violet" href="https://charliemathe.github.io/Threat-Hunting/Second-Vector/" target="_blank" rel="noopener">
       <div class="card-top">
-        <span class="card-num">HUNT-03 · TBD</span>
+        <span class="card-num">HUNT-03 · 2026-06-11</span>
+        <span class="card-arrow">↗</span>
       </div>
       <div>
-        <div class="card-name">Hunt 03</div>
-        <div class="card-subtitle">Operation Unreleased</div>
+        <div class="card-name">Second <em>Vector</em></div>
+        <div class="card-subtitle">M365 Identity Compromise — BEC &amp; Silent Exfiltration</div>
       </div>
       <p class="card-desc">
-        Next operation in progress. Details classified until investigation is complete
-        and report is published.
+        AiTM token replay bypassed MFA on a finance user. Graph API recon, two concealment rules,
+        three SharePoint downloads, a BEC payment-redirect scam, and a Power Automate flow that kept
+        exfiltrating mail nine hours after the attacker logged off.
       </p>
       <div class="card-meta">
-        <span class="tag tag-muted">In Progress</span>
+        <span class="tag tag-critical">Critical</span>
+        <span class="tag tag-violet">M365 / Entra ID</span>
+        <span class="tag tag-muted">BEC</span>
+        <span class="tag tag-muted">Power Automate</span>
       </div>
       <div class="card-divider"></div>
       <div class="card-stats">
         <div class="cs-item">
-          <span class="cs-val">—</span>
+          <span class="cs-val">37</span>
           <span class="cs-key">Flags</span>
         </div>
         <div class="cs-item">
-          <span class="cs-val">—</span>
-          <span class="cs-key">Phases</span>
+          <span class="cs-val">7</span>
+          <span class="cs-key">Log Sources</span>
         </div>
         <div class="cs-item">
-          <span class="cs-val">—</span>
+          <span class="cs-val">12</span>
           <span class="cs-key">MITRE IDs</span>
         </div>
       </div>
-    </div>
+    </a>
 
   </div>
 </section>
