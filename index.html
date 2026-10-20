@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Threat Hunt Portfolio — Károly Mathe</title>
+<title>Threat Hunt Archive | Károly Mathe</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -130,10 +130,11 @@ nav {
 
 .hero h1 {
   font-family: var(--head);
-  font-size: clamp(3.5rem, 9vw, 7rem);
+  font-size: clamp(1.6rem, 8.2vw, 5.4rem);
   font-weight: 700;
   letter-spacing: -0.02em;
-  line-height: 0.92;
+  line-height: 0.98;
+  white-space: nowrap;
   color: #fff;
   margin-bottom: 1.5rem;
 }
@@ -178,6 +179,16 @@ nav {
   text-transform: uppercase;
 }
 
+.stats-note {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  margin-top: 0.75rem;
+  max-width: 640px;
+  line-height: 1.5;
+}
+
 /* SECTION */
 section {
   max-width: 960px;
@@ -208,16 +219,83 @@ section {
   text-transform: uppercase;
 }
 
-/* HUNT GRID */
+/* HUNT GRID: horizontal scroller. Shows 3 cards plus half of the 4th so it is obvious there is more. */
+.hunt-wrap { position: relative; }
+.hunt-wrap::before, .hunt-wrap::after {
+  content: '';
+  position: absolute;
+  top: 1px; bottom: 7px;
+  width: 64px;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.hunt-wrap::before { left: 1px;  background: linear-gradient(90deg, var(--bg), transparent); border-radius: 8px 0 0 8px; }
+.hunt-wrap::after  { right: 1px; background: linear-gradient(270deg, var(--bg), transparent); border-radius: 0 8px 8px 0; }
+.hunt-wrap.more-right::after { opacity: 0.9; }
+.hunt-wrap.more-left::before { opacity: 0.9; }
+
 .hunt-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1px;
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
   background: var(--border);
   border: 1px solid var(--border);
   border-radius: 8px;
-  overflow: hidden;
+  gap: 1px;
+  overscroll-behavior-x: contain;
 }
+/* snapping only for touch; with a mouse wheel it would pull the tiles back */
+@media (pointer: coarse) { .hunt-grid { scroll-snap-type: x mandatory; } }
+.hunt-grid.nudging { scroll-snap-type: none !important; }
+.hunt-grid::-webkit-scrollbar { height: 6px; }
+.hunt-grid::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+.hunt-grid > .hunt-card {
+  flex: 0 0 calc((100% - 3px) / 3.5);
+  min-width: 250px;
+  scroll-snap-align: start;
+}
+
+.scroll-hint {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+.scroll-hint.on { display: flex; }
+.scroll-hint .arrow { display: inline-block; animation: nudge 1.6s ease-in-out infinite; color: var(--blue2); }
+.scroll-hint .arrow.l { animation-direction: reverse; }
+@keyframes nudge { 0%,100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
+@media (prefers-reduced-motion: reduce) { .scroll-hint .arrow { animation: none; } }
+
+.scroll-ctrl {
+  margin-left: auto;
+  display: none;
+  gap: 6px;
+}
+.scroll-ctrl.on { display: flex; }
+.scroll-btn {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text2);
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  width: 32px;
+  height: 28px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.scroll-btn:hover:not(:disabled) { color: #fff; background: var(--surface2); }
+.scroll-btn:disabled { opacity: 0.35; cursor: default; }
 
 /* HUNT CARD */
 .hunt-card {
@@ -242,6 +320,8 @@ section {
 .hunt-card.blue::before   { background: var(--blue); }
 .hunt-card.violet::before { background: #a371f7; }
 .hunt-card.violet .card-name em { color: #a371f7; }
+.hunt-card.jade::before   { background: #00b97a; }
+.hunt-card.jade .card-name em { color: #00b97a; }
 .hunt-card.locked::before { background: var(--border2); }
 
 .hunt-card:not(.locked):hover { background: var(--surface2); }
@@ -331,6 +411,7 @@ section {
 .tag-critical { background: rgba(224,82,82,0.12); color: var(--red); border: 1px solid rgba(224,82,82,0.25); }
 .tag-blue     { background: rgba(79,168,213,0.12); color: var(--blue); border: 1px solid rgba(79,168,213,0.25); }
 .tag-violet   { background: rgba(163,113,247,0.12); color: #a371f7; border: 1px solid rgba(163,113,247,0.25); }
+.tag-jade     { background: rgba(0,185,122,0.12); color: #00b97a; border: 1px solid rgba(0,185,122,0.25); }
 .tag-muted    { background: rgba(110,118,129,0.12); color: var(--muted); border: 1px solid var(--border2); }
 
 .card-divider {
@@ -358,6 +439,7 @@ section {
 }
 .hunt-card.red  .cs-val { color: var(--red); }
 .hunt-card.blue .cs-val { color: var(--blue); }
+.hunt-card.jade .cs-val { color: #00b97a; }
 .hunt-card.locked .cs-val { color: var(--muted); }
 .cs-key {
   font-family: var(--mono);
@@ -366,6 +448,11 @@ section {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
+/* TOOLKIT */
+.tool-rows { display: flex; flex-direction: column; gap: 1rem; width: 100%; }
+.tool-row { display: flex; align-items: baseline; gap: 1.5rem; }
+.tool-row .platform-label { flex: 0 0 110px; }
 
 /* PLATFORM SECTION */
 .platform-strip {
@@ -463,7 +550,9 @@ footer {
 @media (max-width: 640px) {
   .stats { flex-wrap: wrap; }
   .stat { min-width: 50%; border-bottom: 1px solid var(--border); }
-  .hunt-grid { grid-template-columns: 1fr; }
+  .hunt-grid > .hunt-card { flex-basis: 80%; min-width: 0; }
+  .hunt-wrap::before, .hunt-wrap::after { width: 36px; }
+  .tool-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
   nav .nav-right { display: none; }
   footer { flex-direction: column; }
 }
@@ -484,30 +573,31 @@ footer {
 <!-- HERO -->
 <div class="hero">
   <div class="hero-tag">Log(n) Pacific · Threat Hunt Portfolio · 2026</div>
-  <h1>Hunt<br>Archive</h1>
+  <h1>Threat Hunt Archive</h1>
   <p class="hero-desc">
     Threat hunt investigations using Microsoft Sentinel, KQL, and MITRE ATT&CK.
-    Each operation reconstructs a full attack chain from initial access to exfiltration
-    using real telemetry, documented for breach notification and defensive improvement.
+    Each operation reconstructs an attack chain from initial access to impact
+    using log telemetry from simulated environments, documented for defensive improvement.
   </p>
   <div class="stats fade-in">
     <div class="stat">
-      <div class="stat-val">3</div>
+      <div class="stat-val">4</div>
       <div class="stat-label">Hunts Complete</div>
     </div>
     <div class="stat">
-      <div class="stat-val">86</div>
+      <div class="stat-val">111</div>
       <div class="stat-label">Flags Captured</div>
     </div>
     <div class="stat">
-      <div class="stat-val">31+</div>
-      <div class="stat-label">MITRE Techniques</div>
+      <div class="stat-val">58</div>
+      <div class="stat-label">Unique MITRE IDs</div>
     </div>
     <div class="stat">
-      <div class="stat-val">6</div>
+      <div class="stat-val">10</div>
       <div class="stat-label">Hosts Analyzed</div>
     </div>
   </div>
+  <p class="stats-note fade-in">MITRE IDs are unique: each technique or sub-technique is counted once across all hunts, even when more than one hunt used it. The count on each card is unique within that hunt.</p>
 </div>
 
 <!-- HUNTS -->
@@ -515,19 +605,24 @@ footer {
   <div class="section-header fade-in">
     <span class="section-num">01</span>
     <h2 class="section-title">Operations</h2>
+    <div class="scroll-ctrl" id="scrollCtrl">
+      <button class="scroll-btn" id="scrollPrev" type="button" aria-label="Previous hunts">&larr;</button>
+      <button class="scroll-btn" id="scrollNext" type="button" aria-label="Next hunts">&rarr;</button>
+    </div>
   </div>
 
-  <div class="hunt-grid fade-in">
+  <div class="hunt-wrap fade-in" id="huntWrap">
+  <div class="hunt-grid" id="huntGrid">
 
     <!-- HUNT 1: EmberForge -->
     <a class="hunt-card red" href="https://charliemathe.github.io/Threat-Hunting/EmberForge-Source-Leak/" target="_blank" rel="noopener">
       <div class="card-top">
-        <span class="card-num">HUNT-01 · 2026-01-31</span>
+        <span class="card-num">HUNT-01</span>
         <span class="card-arrow">↗</span>
       </div>
       <div>
         <div class="card-name"><em>Ember</em>Forge</div>
-        <div class="card-subtitle">Source Leak — Active Directory Breach</div>
+        <div class="card-subtitle">Source Leak · Active Directory Breach</div>
       </div>
       <p class="card-desc">
         Full domain compromise of a game studio subsidiary in under 3 hours.
@@ -551,7 +646,7 @@ footer {
           <span class="cs-key">Hosts</span>
         </div>
         <div class="cs-item">
-          <span class="cs-val">19</span>
+          <span class="cs-val">25</span>
           <span class="cs-key">MITRE IDs</span>
         </div>
       </div>
@@ -560,7 +655,7 @@ footer {
     <!-- HUNT 2: Signals After the Noise 2 -->
     <a class="hunt-card blue" href="https://charliemathe.github.io/Threat-Hunting/Signals-After-the-Noise-2/" target="_blank" rel="noopener">
       <div class="card-top">
-        <span class="card-num">HUNT-02 · 2026</span>
+        <span class="card-num">HUNT-02</span>
         <span class="card-arrow">↗</span>
       </div>
       <div>
@@ -588,7 +683,7 @@ footer {
           <span class="cs-key">Phases</span>
         </div>
         <div class="cs-item">
-          <span class="cs-val">16</span>
+          <span class="cs-val">13</span>
           <span class="cs-key">MITRE IDs</span>
         </div>
       </div>
@@ -597,12 +692,12 @@ footer {
     <!-- HUNT 3: Second Vector -->
     <a class="hunt-card violet" href="https://charliemathe.github.io/Threat-Hunting/Second-Vector/" target="_blank" rel="noopener">
       <div class="card-top">
-        <span class="card-num">HUNT-03 · 2026-06-11</span>
+        <span class="card-num">HUNT-03</span>
         <span class="card-arrow">↗</span>
       </div>
       <div>
         <div class="card-name">Second <em>Vector</em></div>
-        <div class="card-subtitle">M365 Identity Compromise — BEC &amp; Silent Exfiltration</div>
+        <div class="card-subtitle">M365 Identity Compromise · BEC &amp; Silent Exfiltration</div>
       </div>
       <p class="card-desc">
         AiTM token replay bypassed MFA on a finance user. Graph API recon, two concealment rules,
@@ -632,27 +727,98 @@ footer {
       </div>
     </a>
 
+    <!-- HUNT 4: JadePuffer -->
+    <a class="hunt-card jade" href="https://charliemathe.github.io/Threat-Hunting/JadePuffer/" target="_blank" rel="noopener">
+      <div class="card-top">
+        <span class="card-num">HUNT-04</span>
+        <span class="card-arrow">↗</span>
+      </div>
+      <div>
+        <div class="card-name">Jade<em>Puffer</em></div>
+        <div class="card-subtitle">Agentic Ransomware · Linux Estate</div>
+      </div>
+      <p class="card-desc">
+        An LLM agent chained an unauthenticated Langflow RCE, default credentials and a Nacos backdoor
+        into database extortion across four Linux hosts in about 17 minutes. One human instruction,
+        then machine-speed execution. Two detection rules built and validated.
+      </p>
+      <div class="card-meta">
+        <span class="tag tag-critical">Critical</span>
+        <span class="tag tag-jade">Sentinel / KQL</span>
+        <span class="tag tag-muted">Linux</span>
+        <span class="tag tag-muted">Agentic AI</span>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-stats">
+        <div class="cs-item">
+          <span class="cs-val">25</span>
+          <span class="cs-key">Flags</span>
+        </div>
+        <div class="cs-item">
+          <span class="cs-val">2</span>
+          <span class="cs-key">Rules Built</span>
+        </div>
+        <div class="cs-item">
+          <span class="cs-val">15</span>
+          <span class="cs-key">MITRE IDs</span>
+        </div>
+      </div>
+    </a>
+
   </div>
+  </div>
+  <div class="scroll-hint" id="scrollHint" aria-hidden="true"><span class="arrow l">&larr;</span><span id="hintText">Scroll sideways for more hunts</span><span class="arrow">&rarr;</span></div>
 </section>
 
 <!-- PLATFORM STRIP -->
 <div class="platform-strip fade-in">
   <div class="platform-inner">
-    <span class="platform-label">Toolkit</span>
-    <div class="platform-tools">
-      <span class="tool-pill">Microsoft Sentinel</span>
-      <span class="tool-pill">Microsoft Defender for Endpoint</span>
-      <span class="tool-pill">KQL</span>
-      <span class="tool-pill">MITRE ATT&amp;CK</span>
-      <span class="tool-pill">Sysmon</span>
-      <span class="tool-pill">Azure Log Analytics</span>
-      <span class="tool-pill">Windows Security Events</span>
+    <div class="tool-rows">
+      <div class="tool-row">
+        <span class="platform-label">Platform</span>
+        <div class="platform-tools">
+          <span class="tool-pill">Microsoft Sentinel</span>
+          <span class="tool-pill">Azure Log Analytics</span>
+          <span class="tool-pill">Microsoft Defender for Endpoint</span>
+          <span class="tool-pill">KQL</span>
+        </div>
+      </div>
+      <div class="tool-row">
+        <span class="platform-label">Telemetry</span>
+        <div class="platform-tools">
+          <span class="tool-pill">Sysmon</span>
+          <span class="tool-pill">Defender device tables</span>
+          <span class="tool-pill">Entra ID sign-in logs</span>
+          <span class="tool-pill">Microsoft Graph activity logs</span>
+          <span class="tool-pill">M365 email and cloud app events</span>
+          <span class="tool-pill">Linux audit, syslog and container logs</span>
+          <span class="tool-pill">LLM agent logs</span>
+        </div>
+      </div>
+      <div class="tool-row">
+        <span class="platform-label">Frameworks</span>
+        <div class="platform-tools">
+          <span class="tool-pill">MITRE ATT&amp;CK</span>
+          <span class="tool-pill">MITRE ATLAS</span>
+          <span class="tool-pill">OWASP Top 10</span>
+          <span class="tool-pill">OWASP LLM Top 10</span>
+          <span class="tool-pill">Pyramid of Pain</span>
+        </div>
+      </div>
+      <div class="tool-row">
+        <span class="platform-label">Output</span>
+        <div class="platform-tools">
+          <span class="tool-pill">Detection rules (KQL)</span>
+          <span class="tool-pill">Hunt reports (HTML and Markdown)</span>
+          <span class="tool-pill">Timeline reconstruction</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <footer>
-  <div class="footer-text">Károly Mathe · Log(n) Pacific · TLP:AMBER</div>
+  <div class="footer-text">Károly Mathe · Log(n) Pacific internship portfolio</div>
   <div class="footer-links">
     <a href="https://github.com/CharlieMathe/Threat-Hunting" target="_blank">GitHub</a>
     <a href="https://attack.mitre.org" target="_blank">MITRE ATT&amp;CK</a>
@@ -676,6 +842,65 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.1 });
 document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// Hunt cards: sideways scrolling (arrows, wheel, swipe, edge fades, hint)
+const grid = document.getElementById('huntGrid');
+const wrap = document.getElementById('huntWrap');
+const ctrl = document.getElementById('scrollCtrl');
+const hint = document.getElementById('scrollHint');
+const prev = document.getElementById('scrollPrev');
+const next = document.getElementById('scrollNext');
+const count = grid.querySelectorAll('.hunt-card').length;
+document.getElementById('hintText').textContent = count + ' hunts \u00b7 scroll sideways for more';
+
+function updateScroll() {
+  const max = grid.scrollWidth - grid.clientWidth;
+  const overflow = max > 2;
+  ctrl.classList.toggle('on', overflow);
+  hint.classList.toggle('on', overflow);
+  prev.disabled = grid.scrollLeft <= 2;
+  next.disabled = grid.scrollLeft >= max - 2;
+  wrap.classList.toggle('more-right', overflow && grid.scrollLeft < max - 2);
+  wrap.classList.toggle('more-left', overflow && grid.scrollLeft > 2);
+}
+prev.addEventListener('click', () => grid.scrollBy({ left: -grid.clientWidth * 0.9, behavior: 'smooth' }));
+next.addEventListener('click', () => grid.scrollBy({ left: grid.clientWidth * 0.9, behavior: 'smooth' }));
+grid.addEventListener('scroll', updateScroll, { passive: true });
+window.addEventListener('resize', updateScroll);
+
+// Mouse wheel over the tiles moves them sideways. At either end the page scrolls normally again.
+grid.addEventListener('wheel', e => {
+  if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;   // already a sideways gesture
+  const max = grid.scrollWidth - grid.clientWidth;
+  if (max <= 2) return;
+  const goingRight = e.deltaY > 0;
+  if ((goingRight && grid.scrollLeft < max - 1) || (!goingRight && grid.scrollLeft > 1)) {
+    e.preventDefault();
+    grid.scrollLeft += e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+  }
+}, { passive: false });
+
+// One small nudge the first time the tiles come into view, so it is clear they move.
+let userMoved = false;
+['wheel', 'touchstart', 'pointerdown', 'keydown'].forEach(ev =>
+  grid.addEventListener(ev, () => { userMoved = true; }, { passive: true }));
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const nudgeObs = new IntersectionObserver(entries => {
+    if (!entries[0].isIntersecting) return;
+    nudgeObs.disconnect();
+    setTimeout(() => {
+      if (userMoved || grid.scrollLeft > 2 || grid.scrollWidth <= grid.clientWidth + 2) return;
+      grid.classList.add('nudging');
+      grid.scrollTo({ left: 90, behavior: 'smooth' });
+      setTimeout(() => {
+        grid.scrollTo({ left: 0, behavior: 'smooth' });
+        setTimeout(() => grid.classList.remove('nudging'), 600);
+      }, 800);
+    }, 700);
+  }, { threshold: 0.6 });
+  nudgeObs.observe(grid);
+}
+updateScroll();
 </script>
 </body>
 </html>
