@@ -4,7 +4,7 @@
 
 # JadePuffer: Hunting an AI Agent That Runs Ransomware
 
-An internship threat hunt by Károly Mathe, Log(n) Pacific. A guided exercise in Microsoft Sentinel and KQL, built on Sysdig's public disclosure of JADEPUFFER. The company, hosts and data in the exercise are fictional.
+An internship threat hunt by Károly Mathe, Log(n) Pacific in Microsoft Sentinel and KQL, built on Sysdig's public disclosure of JADEPUFFER. The company, hosts and data in the exercise are fictional.
 
 **Source:** [JADEPUFFER: Agentic Ransomware for Automated Database Extortion](https://www.sysdig.com/blog/jadepuffer-agentic-ransomware-for-automated-database-extortion), Sysdig Threat Research Team, 1 July 2026.
 **Full report:** [HTML version](index.html) | [Markdown version](JadePuffer_Threat_Hunt_Report.md)
