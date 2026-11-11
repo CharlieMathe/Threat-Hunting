@@ -124,7 +124,6 @@ Both rules are one day of data only, so behaviour over longer periods is unteste
 |------|------------|
 | `index.html` | The full report as a web page |
 | `JadePuffer_Threat_Hunt_Report.md` | The full report as markdown |
-| `Karoly Jadepuffer notes.md` | My working notes, flag by flag |
 | `Screenshots/` | Evidence screenshots used in the report |
 
 ---
