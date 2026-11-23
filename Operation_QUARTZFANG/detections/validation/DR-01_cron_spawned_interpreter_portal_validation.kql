@@ -1,0 +1,7 @@
+// DR-01 validation query as run: baseline, attack window and after
+DeviceProcessEvents_CL
+| where Timestamp between (datetime(2026-09-15 00:00:00) .. datetime(2026-09-21 00:00:00))
+| where DeviceName =~ "sc-portal01"
+| where InitiatingProcessFileName =~ "cron" and FileName in~ ("python3", "python", "perl", "sh", "bash", "nc")
+| extend Period = case(Timestamp < datetime(2026-09-20 06:30:00), "baseline", Timestamp <= datetime(2026-09-20 08:30:00), "attack window", "after")
+| summarize Hits = dcount(Timestamp), First = min(Timestamp) by Period

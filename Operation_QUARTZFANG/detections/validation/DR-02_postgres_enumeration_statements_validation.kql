@@ -1,0 +1,8 @@
+// DR-02 validation query as run: baseline, attack window and after
+Syslog
+| where TimeGenerated between (datetime(2026-09-15 00:00:00) .. datetime(2026-09-21 00:00:00))
+| where Computer =~ "sc-db01" and ProcessName =~ "postgres"
+| where SyslogMessage startswith "statement:"
+| where SyslogMessage has_any ("information_schema", "pg_catalog", "pg_shadow", "password_hash") or SyslogMessage matches regex @"(?i)statement:\s*SELECT \* FROM \w+\s*$"
+| extend Period = case(TimeGenerated < datetime(2026-09-20 06:30:00), "baseline", TimeGenerated <= datetime(2026-09-20 08:30:00), "attack window", "after")
+| summarize Hits = dcount(TimeGenerated), First = min(TimeGenerated), Stmts = dcount(SyslogMessage) by Period

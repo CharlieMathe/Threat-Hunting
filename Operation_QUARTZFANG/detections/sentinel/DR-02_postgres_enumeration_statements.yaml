@@ -1,0 +1,32 @@
+id: 0499415b-3b01-5b1f-baf8-57d68d42157c
+name: "QUARTZFANG DR-02: Database enumeration statements"
+description: |
+  Statements that read information_schema, pg_catalog, pg_shadow or password_hash, or a bare SELECT * FROM a table, on the production database. The attacker shared the application's account and source IP, so statement shape is the discriminator.
+  Validation: Attack window: 6 hits, 6 distinct attacker statements (true positives). Baseline: 4 hits, the same six statements on 2026-09-19 at 23:12:32 and 23:13:56 on a connection labelled application_name=portal_svc. Cause not established, so neither counted as true nor false positive. Status: draft.
+  Blind spots: Targeted statements that name their columns and avoid the system catalogues do not match (the 07:45 project and customer reads were missed).
+severity: High
+status: Experimental
+requiredDataConnectors: []
+queryFrequency: 1h
+queryPeriod: 1h
+triggerOperator: gt
+triggerThreshold: 0
+tactics:
+  - Collection
+relevantTechniques:
+  - T1213.006
+query: |
+  Syslog
+  | where TimeGenerated > ago(1h)
+  | where Computer =~ "sc-db01" and ProcessName =~ "postgres"
+  | where SyslogMessage startswith "statement:"
+  | where SyslogMessage has_any ("information_schema", "pg_catalog", "pg_shadow", "password_hash")
+      or SyslogMessage matches regex @"(?i)statement:\s*SELECT \* FROM \w+\s*$"
+  | project TimeGenerated, Computer, ProcessID, SyslogMessage
+entityMappings:
+  - entityType: Host
+    fieldMappings:
+      - identifier: HostName
+        columnName: Computer
+version: 1.0.0
+kind: Scheduled

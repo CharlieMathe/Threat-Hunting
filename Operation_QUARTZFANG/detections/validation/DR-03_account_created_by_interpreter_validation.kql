@@ -1,0 +1,8 @@
+// DR-03 validation form: same windows as DR-01 and DR-02
+// (the report records the results; this is the query to reproduce them)
+DeviceProcessEvents_CL
+| where Timestamp between (datetime(2026-09-15 00:00:00) .. datetime(2026-09-21 00:00:00))
+| where FileName in~ ("useradd", "adduser", "usermod")
+| where InitiatingProcessFileName in~ ("python3", "python", "perl", "sh", "cron")
+| extend Period = case(Timestamp < datetime(2026-09-20 06:30:00), "baseline", Timestamp <= datetime(2026-09-20 08:30:00), "attack window", "after")
+| summarize Hits = dcount(Timestamp), First = min(Timestamp), Commands = make_set(ProcessCommandLine) by Period

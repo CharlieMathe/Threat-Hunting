@@ -1,0 +1,36 @@
+id: 0f06f2c2-fa83-5174-bfc3-ce1933e3f50f
+name: "QUARTZFANG DR-03: Account created or added to sudo by an interpreter"
+description: |
+  useradd, adduser or usermod started by python, perl, sh or cron rather than by an administrator's session. In the QUARTZFANG hunt this caught the svc_monitor backdoor account and its sudo membership.
+  Validation: Attack window 2026-09-20 06:30 to 08:30: 2 hits (useradd and usermod -aG sudo for svc_monitor, both true positives). Baseline 2026-09-15 to 2026-09-20 06:30: 0 hits in 1,219 process events.
+  Blind spots: Editing /etc/passwd or /etc/sudoers directly, or a parent process not in the list. Next iteration: add file events on /etc/passwd, /etc/sudoers and authorized_keys.
+severity: High
+status: Available
+requiredDataConnectors: []
+queryFrequency: 1h
+queryPeriod: 1h
+triggerOperator: gt
+triggerThreshold: 0
+tactics:
+  - Persistence
+  - PrivilegeEscalation
+relevantTechniques:
+  - T1136.001
+  - T1098
+query: |
+  DeviceProcessEvents_CL
+  | where Timestamp > ago(1h)
+  | where FileName in~ ("useradd", "adduser", "usermod")
+  | where InitiatingProcessFileName in~ ("python3", "python", "perl", "sh", "cron")
+  | project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, ProcessCommandLine
+entityMappings:
+  - entityType: Host
+    fieldMappings:
+      - identifier: HostName
+        columnName: DeviceName
+  - entityType: Account
+    fieldMappings:
+      - identifier: Name
+        columnName: AccountName
+version: 1.0.0
+kind: Scheduled

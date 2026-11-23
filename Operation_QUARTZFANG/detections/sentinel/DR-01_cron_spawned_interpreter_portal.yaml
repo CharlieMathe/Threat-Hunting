@@ -1,0 +1,37 @@
+id: a0cf44bb-2cfd-5062-b528-ad74560921b7
+name: "QUARTZFANG DR-01: Interpreter or shell started by cron on the portal"
+description: |
+  Cron launching python, perl, sh, bash or nc on the web portal. In the QUARTZFANG hunt this caught the reverse shell (PID 4401) that cron started seconds after the gopher:// request to Redis (the cron write itself is inferred: Redis is not logged).
+  Validation: Attack window 2026-09-20 06:30 to 08:30: 1 hit (06:52:52, true positive). Baseline 2026-09-15 to 2026-09-20 06:30: 0 hits in 1,219 process events. After the window: 0 hits in 359 events.
+  Blind spots: Estates that run every cron job through /bin/sh -c would flood this rule; add a command-line filter (socket, connect) there. Systemd timers and compiled binaries do not match.
+severity: High
+status: Available
+requiredDataConnectors: []
+queryFrequency: 1h
+queryPeriod: 1h
+triggerOperator: gt
+triggerThreshold: 0
+tactics:
+  - Persistence
+  - Execution
+relevantTechniques:
+  - T1053.003
+  - T1059.006
+query: |
+  DeviceProcessEvents_CL
+  | where Timestamp > ago(1h)
+  | where DeviceName =~ "sc-portal01"
+  | where InitiatingProcessFileName =~ "cron"
+  | where FileName in~ ("python3", "python", "perl", "sh", "bash", "nc")
+  | project Timestamp, DeviceName, AccountName, FileName, ProcessId, ProcessCommandLine
+entityMappings:
+  - entityType: Host
+    fieldMappings:
+      - identifier: HostName
+        columnName: DeviceName
+  - entityType: Account
+    fieldMappings:
+      - identifier: Name
+        columnName: AccountName
+version: 1.0.0
+kind: Scheduled
